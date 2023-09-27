@@ -29,7 +29,7 @@ This repository contains the code, documentation, and resources for the AI App D
 
 1. **Clone the Repository**
     ```sh
-    git clone https://github.com/your-username/AI-App-Developers-Prototype.git
+    git clone https://github.com/rajshirolkar/AI-App-Developers-Prototype.git
     cd AI-App-Developers-Prototype
     ```
 
