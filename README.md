@@ -30,7 +30,7 @@ This repository contains the code, documentation, and resources for the AI App D
 1. **Clone the Repository**
     ```sh
     git clone https://github.com/rajshirolkar/AI-developer-assistant.git
-    cd AI-App-Developers-Prototype
+    cd AI-developer-assistant
     ```
 
 2. **Set Up the Environment**
