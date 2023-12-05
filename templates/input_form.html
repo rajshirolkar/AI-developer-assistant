@@ -1,6 +1,6 @@
 <!-- templates/input_form.html -->
 
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Text Evaluation</title>
@@ -23,4 +23,99 @@
     <p>Fluency: <span style="color: {{ score_colors.Fluency }}">{{ scores.Fluency }}</span></p>
     {% endif %}
 </body>
+</html> -->
+
+<!-- templates/input_form.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Evaluation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            margin-top: 30px;
+        }
+        label {
+            margin-top: 10px;
+            display: block;
+            color: #666;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-sizing: border-box;
+            height: 100px;
+            resize: vertical;
+        }
+        input[type=submit] {
+            width: 100%;
+            padding: 10px;
+            background-color: #5cb85c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        input[type=submit]:hover {
+            background-color: #4cae4c;
+        }
+        .scores {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eee;
+            border-left: 3px solid #5cb85c;
+        }
+        .scores p {
+            margin: 0;
+            padding: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Text Evaluation with OpenAI</h1>
+        <form action="/generate-and-score/" method="post">
+            <label for="prompt">Enter your text:</label>
+            <textarea id="prompt" name="prompt" rows="4" cols="50"></textarea>
+            <input type="submit" value="Evaluate">
+        </form>
+
+        {% if response %}
+        <div class="response">
+            <h2>Response:</h2>
+            <p>{{ response }}</p>
+        </div>
+        <div class="scores">
+            <h2>Scores:</h2>
+            <p>Relevance: <span style="color: {{ score_colors.Relevance }}">{{ scores.Relevance }}</span></p>
+            <p>Coherence: <span style="color: {{ score_colors.Coherence }}">{{ scores.Coherence }}</span></p>
+            <p>Consistency: <span style="color: {{ score_colors.Consistency }}">{{ scores.Consistency }}</span></p>
+            <p>Fluency: <span style="color: {{ score_colors.Fluency }}">{{ scores.Fluency }}</span></p>
+        </div>
+        {% endif %}
+    </div>
+</body>
 </html>
+
