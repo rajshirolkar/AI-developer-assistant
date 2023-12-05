@@ -1,3 +1,4 @@
+from typing import Dict
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.params import Form
 from fastapi.templating import Jinja2Templates
@@ -18,15 +19,16 @@ templates = Jinja2Templates(directory="templates")
 app = FastAPI()
 
 class EvaluationScores(BaseModel):
-    Relevance: int = Field(..., description="Score for relevance of the text")
-    Coherence: int = Field(..., description="Score for coherence of the text")
-    Consistency: int = Field(..., description="Score for consistency of the text")
-    Fluency: int = Field(..., description="Score for fluency of the text")
+    Relevance: int = Field(ge=1, le=5, description="Score for the relevance of the text")
+    Coherence: int = Field(ge=1, le=5, description="Score for the coherence of the text")
+    Consistency: int = Field(ge=1, le=5, description="Score for the consistency of the text")
+    Fluency: int = Field(ge=1, le=5, description="Score for the fluency of the text")
 
 class GenerationResponse(BaseModel):
     prompt: str = Field(..., description="The original prompt text")
     response: str = Field(..., description="The generated text response from OpenAI")
     scores: EvaluationScores = Field(..., description="Evaluation scores for the generated text")
+    score_colors: Dict[str, str] = Field(..., description="Color coding for the scores")
 
 class Prompt(BaseModel):
     text: str
@@ -36,7 +38,7 @@ async def read_form(request: Request):
     return templates.TemplateResponse("input_form.html", {"request": request})
 
 
-@app.post("/generate-and-score/")
+@app.post("/generate-and-score/", response_model=GenerationResponse)
 async def generate_and_score(request: Request, prompt: str = Form(...)):
     # Ensure the API key is set
     openai.api_key = os.getenv("OPENAI_API_KEY")
@@ -69,38 +71,6 @@ async def generate_and_score(request: Request, prompt: str = Form(...)):
         "score_colors": score_colors
     }
     return templates.TemplateResponse("input_form.html", response_data)
-
-
-
-class QueryInput(BaseModel):
-    sql_query: str
-
-@app.post("/query-plan")
-def get_query_plan(query_input: QueryInput):
-    # Connect to the SQLite database
-    try:
-        conn = sqlite3.connect('chinook.db')
-        cursor = conn.cursor()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-    # Get the query plan
-    try:
-        plan_query = f"EXPLAIN QUERY PLAN {query_input.sql_query}"
-        cursor.execute(plan_query)
-        plan = cursor.fetchall()
-        # Adding column names to the response
-        columns = ["id", "parent", "notused", "detail"]
-        plan_with_columns = [dict(zip(columns, row)) for row in plan]
-    except Exception as e:
-        cursor.close()
-        conn.close()
-        raise HTTPException(status_code=400, detail=str(e))
-    
-    cursor.close()
-    conn.close()
-
-    return {"query_plan": plan_with_columns}
 
 if __name__ == "__main__":
     import uvicorn
