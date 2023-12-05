@@ -9,7 +9,7 @@ import openai
 import os
 from dotenv import load_dotenv
 
-from evaluation_utils.eval import evaluate_response
+from evaluation_utils.openai_eval import evaluate_response
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -66,6 +66,7 @@ async def generate_and_score(request: Request, prompt: str = Form(...)):
 
     response_data = {
         "request": request,
+        "prompt": prompt,
         "response": generated_text,
         "scores": scores,
         "score_colors": score_colors

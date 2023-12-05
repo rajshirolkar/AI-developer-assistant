@@ -1,4 +1,4 @@
-from evaluation_utils.eval_criteria import (
+from evaluation_utils.openai_eval_criteria import (
     CONSISTENCY_SCORE_CRITERIA,
     CONSISTENCY_SCORE_STEPS,
     EVALUATION_PROMPT_TEMPLATE,
