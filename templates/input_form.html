@@ -1,0 +1,26 @@
+<!-- templates/input_form.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Text Evaluation</title>
+</head>
+<body>
+    <h1>Text Evaluation with OpenAI</h1>
+    <form action="/generate-and-score/" method="post">
+        <label for="prompt">Enter your text:</label><br>
+        <textarea id="prompt" name="prompt" rows="4" cols="50"></textarea><br>
+        <input type="submit" value="Evaluate">
+    </form>
+
+    {% if response %}
+    <h2>Response:</h2>
+    <p>{{ response }}</p>
+    <h2>Scores:</h2>
+    <p>Relevance: <span style="color: {{ score_colors.Relevance }}">{{ scores.Relevance }}</span></p>
+    <p>Coherence: <span style="color: {{ score_colors.Coherence }}">{{ scores.Coherence }}</span></p>
+    <p>Consistency: <span style="color: {{ score_colors.Consistency }}">{{ scores.Consistency }}</span></p>
+    <p>Fluency: <span style="color: {{ score_colors.Fluency }}">{{ scores.Fluency }}</span></p>
+    {% endif %}
+</body>
+</html>
