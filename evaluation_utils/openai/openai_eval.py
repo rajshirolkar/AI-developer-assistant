@@ -1,4 +1,4 @@
-from evaluation_utils.openai_eval_criteria import (
+from evaluation_utils.openai.openai_eval_criteria import (
     CONSISTENCY_SCORE_CRITERIA,
     CONSISTENCY_SCORE_STEPS,
     EVALUATION_PROMPT_TEMPLATE,
@@ -26,13 +26,14 @@ def evaluate_response(response_text, client):
 
     return scores
 
+
 def get_geval_score(client, criteria, steps, response, metric_name):
     # Construct the evaluation prompt
     prompt = EVALUATION_PROMPT_TEMPLATE.format(
         criteria=criteria,
         steps=steps,
         document=response,  # In this case, the document is the response itself
-        summary=response,   # Using response as both the document and summary for evaluation
+        summary=response,  # Using response as both the document and summary for evaluation
         metric_name=metric_name,
     )
 
