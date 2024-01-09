@@ -10,7 +10,12 @@ import os
 from dotenv import load_dotenv
 
 from evaluation_utils.azure.azure_eval import azure_evaluation
+from evaluation_utils.eval_copilot.copilot_eval_criteria import evaluation_system_prompt, evaluation_instructions, \
+    improvement_user_instructions, improvement_system_content, example_improvement_suggestions
 from evaluation_utils.eval_copilot.eval_copilot import copilot_evaluation
+from evaluation_utils.eval_copilot.improvement_copilot import ImprovementCopilot
+from models.evaluation_models import CopilotEvaluationResponse, CopilotEvaluation
+from models.prompt_models import GenerationResponse
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -20,38 +25,51 @@ templates = Jinja2Templates(directory="templates")
 app = FastAPI()
 
 
-class EvaluationScores(BaseModel):
-    Relevance: int = Field(ge=1, le=5, description="Score for the relevance of the text")
-    Coherence: int = Field(ge=1, le=5, description="Score for the coherence of the text")
-    Consistency: int = Field(ge=1, le=5, description="Score for the consistency of the text")
-    Fluency: int = Field(ge=1, le=5, description="Score for the fluency of the text")
-
-
-class GenerationResponse(BaseModel):
-    prompt: str = Field(..., description="The original prompt text")
-    response: str = Field(..., description="The generated text response from OpenAI")
-    scores: EvaluationScores = Field(..., description="Evaluation scores for the generated text")
-    score_colors: Dict[str, str] = Field(..., description="Color coding for the scores")
-
-
-class CopilotEvaluation(BaseModel):
-    score: int = Field(ge=1, le=5, description="Evaluation score")
-    justification: str = Field(..., description="Justification for the given score")
-    improvement_suggestion: str = Field(..., description="Suggested actionable improvement")
-
-class CopilotEvaluationResponse(BaseModel):
-    prompt: str = Field(..., description="The original prompt text")
-    response: str = Field(..., description="The generated text response from OpenAI")
-    evaluation: CopilotEvaluation = Field(..., description="Copilot evaluation details")
-
-
-class Prompt(BaseModel):
-    text: str
-
-
 @app.get("/", response_class=HTMLResponse)
 async def read_form(request: Request):
     return templates.TemplateResponse("input_form.html", {"request": request})
+
+
+class CoherenceEvaluation(BaseModel):
+    coherence: int = Field(ge=1, le=5, description="Score for the coherence of the text")
+    justification: str = Field(..., description="Justification for the given score")
+    improvement_suggestion: str = Field(..., description="Suggested actionable improvement")
+
+
+improvement_copilot = ImprovementCopilot(improvement_instructions=improvement_user_instructions,
+                                         improvement_system_prompt=improvement_system_content,
+                                         evaluation_instructions=evaluation_instructions,
+                                         evaluation_system_prompt=evaluation_system_prompt,
+                                         few_shot_examples=example_improvement_suggestions)
+
+
+@app.post("/use-evaluation-copilot/", response_model=CoherenceEvaluation)
+async def use_evaluation_copilot(request: Request, prompt: str = Form(...)):
+    # Ensure the API key is set
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+
+    # Generate the response from OpenAI
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        generated_text = response.choices[0].message.content
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    # Use ImprovementCopilot to get the coherence score justification improvement suggestion
+    # Use ImprovementCopilot to get the coherence score justification improvement suggestion
+    coherence, justification, improvement_suggestion = improvement_copilot.get_improvement_suggestion(prompt,
+                                                                                                      generated_text)
+    response_data = {
+        "request": request,
+        "response": generated_text,
+        "coherence": coherence,
+        "justification": justification,
+        "improvement_suggestion": improvement_suggestion
+    }
+    return templates.TemplateResponse("input_form.html", response_data)
 
 
 @app.post("/generate-and-score/", response_model=GenerationResponse)
@@ -117,6 +135,7 @@ async def eval_copilot(request: Request, prompt: str = Form(...)):
         )
     )
     return evaluation_data
+
 
 if __name__ == "__main__":
     import uvicorn

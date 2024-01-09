@@ -69,23 +69,22 @@
 <body>
     <div class="container">
         <h1>Text Evaluation with OpenAI</h1>
-        <form action="/generate-and-score/" method="post">
+        <form action="/use-evaluation-copilot/" method="post">
             <label for="prompt">Enter your text:</label>
             <textarea id="prompt" name="prompt" rows="4" cols="50">{{ prompt }}</textarea>
             <input type="submit" value="Evaluate">
         </form>
 
-        {% if response %}
-        <div class="response">
+       {% if coherence %}
+           <div class="response">
             <h2>Response:</h2>
             <p>{{ response }}</p>
         </div>
-        <div class="scores">
-            <h2>Scores:</h2>
-{#            <p>Relevance: <span style="color: {{ score_colors.Relevance }}">{{ scores.Relevance }}</span></p>#}
-            <p>Coherence: <span style="color: {{ score_colors.Coherence }}">{{ scores.Coherence }}</span></p>
-{#            <p>Consistency: <span style="color: {{ score_colors.Consistency }}">{{ scores.Consistency }}</span></p>#}
-            <p>Fluency: <span style="color: {{ score_colors.Fluency }}">{{ scores.Fluency }}</span></p>
+        <div class="evaluation">
+            <h2>Evaluation:</h2>
+            <p><strong>Coherence Score:</strong> {{ coherence }}</p>
+            <p><strong>Justification:</strong> {{ justification }}</p>
+            <p><strong>Improvement Suggestion:</strong> {{ improvement_suggestion }}</p>
         </div>
         {% endif %}
     </div>

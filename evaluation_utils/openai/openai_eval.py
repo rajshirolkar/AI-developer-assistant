@@ -27,6 +27,29 @@ def evaluate_response(response_text, client):
     return scores
 
 
+def create_message(role, content):
+    return {
+        "role": role,
+        "content": content
+    }
+
+
+simple_prompt = create_message("system", "You are a helpful assistant.")
+
+
+def get_simple_response(user_prompt, client):
+    try:
+        api_response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": user_prompt}]
+        )
+        return api_response.choices[0].message.content
+    except Exception as e:
+        # Handle exceptions (e.g., API errors) and possibly log them
+        print(f"Error during evaluation: {e}")
+        return "0"  # Return a default score in case of an error
+
+
 def get_geval_score(client, criteria, steps, response, metric_name):
     # Construct the evaluation prompt
     prompt = EVALUATION_PROMPT_TEMPLATE.format(
