@@ -10,9 +10,18 @@ import os
 from dotenv import load_dotenv
 
 from evaluation_utils.azure.azure_eval import azure_evaluation
-from evaluation_utils.eval_copilot.copilot_eval_criteria import evaluation_system_prompt, evaluation_instructions, \
-    improvement_user_instructions, improvement_system_content, example_improvement_suggestions
-from evaluation_utils.eval_copilot.eval_copilot import copilot_evaluation
+from evaluation_utils.eval_copilot.copilot_eval_criteria import (
+    evaluation_system_prompt,
+    evaluation_instructions,
+    improvement_user_instructions,
+    improvement_system_content,
+    example_improvement_suggestions,
+    new_coherence_prompt,
+)
+from evaluation_utils.eval_copilot.eval_copilot import (
+    copilot_evaluation,
+    EvaluationCopilot,
+)
 from evaluation_utils.eval_copilot.improvement_copilot import ImprovementCopilot
 from models.evaluation_models import CopilotEvaluationResponse, CopilotEvaluation
 from models.prompt_models import GenerationResponse
@@ -31,16 +40,24 @@ async def read_form(request: Request):
 
 
 class CoherenceEvaluation(BaseModel):
-    coherence: int = Field(ge=1, le=5, description="Score for the coherence of the text")
+    coherence: int = Field(
+        ge=1, le=5, description="Score for the coherence of the text"
+    )
     justification: str = Field(..., description="Justification for the given score")
-    improvement_suggestion: str = Field(..., description="Suggested actionable improvement")
+    improvement_suggestion: str = Field(
+        ..., description="Suggested actionable improvement"
+    )
 
 
-improvement_copilot = ImprovementCopilot(improvement_instructions=improvement_user_instructions,
-                                         improvement_system_prompt=improvement_system_content,
-                                         evaluation_instructions=evaluation_instructions,
-                                         evaluation_system_prompt=evaluation_system_prompt,
-                                         few_shot_examples=example_improvement_suggestions)
+improvement_copilot = ImprovementCopilot(
+    improvement_instructions=improvement_user_instructions,
+    improvement_system_prompt=improvement_system_content,
+    evaluation_instructions=evaluation_instructions,
+    evaluation_system_prompt=evaluation_system_prompt,
+    few_shot_examples=example_improvement_suggestions,
+)
+
+new_evaluation = EvaluationCopilot(new_coherence_prompt)
 
 
 @app.post("/use-evaluation-copilot/", response_model=CoherenceEvaluation)
@@ -51,23 +68,32 @@ async def use_evaluation_copilot(request: Request, prompt: str = Form(...)):
     # Generate the response from OpenAI
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
+            model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}]
         )
         generated_text = response.choices[0].message.content
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    # Use ImprovementCopilot to get the coherence score justification improvement suggestion
-    # Use ImprovementCopilot to get the coherence score justification improvement suggestion
-    coherence, justification, improvement_suggestion = improvement_copilot.get_improvement_suggestion(prompt,
-                                                                                                      generated_text)
+    (
+        coherence,
+        justification,
+        improvement_suggestion,
+    ) = improvement_copilot.get_improvement_suggestion(prompt, generated_text)
+
+    print("Coherence:", coherence)
+    (
+        new_evaluation_score,
+        new_evaluation_justification,
+    ) = new_evaluation.get_score_and_justification(prompt, generated_text)
     response_data = {
         "request": request,
+        "prompt": prompt,
         "response": generated_text,
         "coherence": coherence,
         "justification": justification,
-        "improvement_suggestion": improvement_suggestion
+        "improvement_suggestion": improvement_suggestion,
+        "new_evaluation_score": new_evaluation_score,
+        "new_evaluation_justification": new_evaluation_justification,
     }
     return templates.TemplateResponse("input_form.html", response_data)
 
@@ -81,8 +107,7 @@ async def generate_and_score(request: Request, prompt: str = Form(...)):
     # Generate the response from OpenAI
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
+            model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}]
         )
         generated_text = response.choices[0].message.content
     except Exception as e:
@@ -92,9 +117,9 @@ async def generate_and_score(request: Request, prompt: str = Form(...)):
     scores = azure_evaluation(prompt, generated_text, client)
     score_colors = {
         # "Relevance": "red" if int(scores['Relevance']) < 3 else "green",
-        "Coherence": "red" if int(scores['Coherence']) < 3 else "green",
+        "Coherence": "red" if int(scores["Coherence"]) < 3 else "green",
         # "Consistency": "red" if int(scores['Consistency']) < 3 else "green",
-        "Fluency": "red" if int(scores['Fluency']) < 3 else "green",
+        "Fluency": "red" if int(scores["Fluency"]) < 3 else "green",
     }
 
     response_data = {
@@ -102,7 +127,7 @@ async def generate_and_score(request: Request, prompt: str = Form(...)):
         "prompt": prompt,
         "response": generated_text,
         "scores": scores,
-        "score_colors": score_colors
+        "score_colors": score_colors,
     }
     return templates.TemplateResponse("input_form.html", response_data)
 
@@ -112,8 +137,7 @@ async def eval_copilot(request: Request, prompt: str = Form(...)):
     # Generate the response from OpenAI
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}]
+            model="gpt-4", messages=[{"role": "user", "content": prompt}]
         )
         generated_text = response.choices[0].message.content
     except Exception as e:
@@ -129,10 +153,10 @@ async def eval_copilot(request: Request, prompt: str = Form(...)):
         prompt=prompt,
         response=generated_text,
         evaluation=CopilotEvaluation(
-            score=evaluations['Coherence']['score'],
-            justification=evaluations['Coherence']['justification'],
-            improvement_suggestion=evaluations['Coherence']['improvement_suggestion']
-        )
+            score=evaluations["Coherence"]["score"],
+            justification=evaluations["Coherence"]["justification"],
+            improvement_suggestion=evaluations["Coherence"]["improvement_suggestion"],
+        ),
     )
     return evaluation_data
 

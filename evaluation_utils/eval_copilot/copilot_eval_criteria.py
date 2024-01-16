@@ -1,16 +1,43 @@
+new_coherence_prompt = """
+Your task is to evaluate the coherence of a given text response provided by an LLM. Coherence refers to how logically and consistently the ideas are presented in the text. After reading the response, you are to assign a coherence score ranging from 1 to 5, where 1 indicates very low coherence and 5 indicates very high coherence.
+
+Score Criteria:
+
+Score 1 (Very Low Coherence): The text is highly disjointed, with numerous unrelated or contradictory ideas. It lacks logical flow and is challenging to understand.
+Score 2 (Low Coherence): The text shows some related ideas but is largely inconsistent, with several logical gaps or contradictions.
+Score 3 (Moderate Coherence): The text has a fair structure and flow, but there are noticeable issues in logic or consistency that hinder understanding.
+Score 4 (High Coherence): The text is well-structured with clear, logically connected ideas, though it may have minor lapses in coherence.
+Score 5 (Very High Coherence): The text exhibits excellent structure, with ideas presented logically and cohesively, providing a seamless reading experience.
+Evaluation Process:
+
+Read the provided LLM response carefully. Analyze the logical flow of ideas, consistency of arguments, 
+and the overall structure of the text. Assign a coherence score based on the criteria provided. Justify your score: 
+Explain specifically what aspects of the text influenced the score, citing examples from the text to support your 
+evaluation. Consider factors such as logical flow, relevance to the question asked, clarity of ideas, 
+and the presence of contradictory or unrelated statements. Your output should be structured as follows:
+Stars: [Insert Score from 1 to 5]
+Justification: [Provide a detailed explanation of why this score was given, citing specific examples or parts of the text that influenced the score.]
+Please remember that your evaluation should focus solely on the coherence of the content, not on its accuracy or other aspects of language quality
+"""
+
+
 evaluation_system_prompt = """You are an AI assistant tasked with evaluating the coherence of answers in a 
 question-and-answer format. Your evaluation should be based on how well the sentences in the answer integrate to form 
 a unified and logical whole. Your responsibilities include: (1) assigning a coherence score using a 1-5 star rating 
 system, (2) providing a detailed justification for the assigned score. Always provide a score as an integer between 1 and 5. Along with each score, include a clear justification, 
 pointing out the aspects of the answer that influenced your rating."""
 
-improvement_system_content = """System: You are an AI assistant tasked with suggesting improvements to user prompts based on coherence scores and justifications provided. Your goal is to analyze the given score and its justification, then identify and suggest specific changes to the user prompt that could lead to clearer and more coherent answers in the future. Consider factors like specificity, clarity, and guidance offered in the prompt. Provide actionable suggestions to refine the user's prompt, making it more effective for eliciting coherent responses."""
+improvement_system_content = """System: You are an AI assistant tasked with suggesting improvements to user prompts 
+based on coherence scores and justifications provided. Your goal is to analyze the given score and its justification, 
+then identify and suggest specific changes to the user prompt that could lead to clearer and more coherent answers in 
+the future. Consider factors like specificity, clarity, and guidance offered in the prompt. Provide actionable 
+suggestions to refine the user's prompt, making it more effective for eliciting coherent responses."""
 
-improvement_user_instructions = """User: When you receive a coherence score and justification for a response, 
-use this information to suggest specific improvements to the original user prompt. Focus on how the prompt can be 
+improvement_user_instructions = """User: When you receive a coherence score and justification for an answer, 
+use this information to suggest specific improvements to the original user question. Focus on how the question can be 
 rephrased or structured differently to guide respondents towards providing more coherent and relevant answers. 
 Consider aspects such as clarity, specificity, and the framing of the question. Your suggestions should aim to 
-enhance the quality of future responses by refining the prompt."""
+enhance the quality of future responses by refining the question."""
 
 evaluation_instructions = """When scoring the coherence of an answer, consider how seamlessly the sentences connect and contribute to a 
 unified understanding of the topic. Use the following scale for scoring: - One star: The answer completely lacks 
@@ -50,11 +77,21 @@ coherency. It directly addresses the question with a clear and concise explanati
 environmental impacts. The answer is well-structured, logically flowing from one point to the next, and covers a 
 broad range of relevant effects, making it a coherent response."""
 
-improvement_content_1 = """Improvement Suggestion: To ensure a coherent answer, the question could be more specific and guiding. For instance: "What is your favorite indoor activity that helps you relax or feel entertained, and can you explain why you find it enjoyable?" """
-improvement_content_2 = """Improvement Suggestion: To guide the respondent towards a coherent answer, the question might include a prompt for structured response, such as: "Can you describe the genre, setting, and main theme of your favorite movie, without giving away any spoilers?" """
-improvement_content_3 = """Improvement Suggestion: The question is already well-structured for coherent answers. To further guide the response, it could be slightly modified to: "Can you list and briefly explain at least three health benefits of regular exercise?" """
-improvement_content_4 = """Improvement Suggestion: This question generally prompts coherent answers. To enhance it, consider adding: "How do you cope with stress in your daily life, and can you describe how these methods effectively help you manage stress?" """
-improvement_content_5 = """Improvement Suggestion: The question is already conducive to coherent answers. To maintain this quality, it could be rephrased for clarity and depth: "What are the key impacts of climate change on the environment, and how do these effects manifest in different ecological and societal aspects?" """
+improvement_content_1 = """Improvement Suggestion: To ensure a coherent answer, the question could be more specific 
+and guiding. For instance: "What is your favorite indoor activity that helps you relax or feel entertained, 
+and can you explain why you find it enjoyable?"""
+improvement_content_2 = """Improvement Suggestion: To guide the respondent towards a coherent answer, the question 
+might include a prompt for structured response, such as: "Can you describe the genre, setting, and main theme of your 
+favorite movie, without giving away any spoilers?"""
+improvement_content_3 = """Improvement Suggestion: The question is already well-structured for coherent answers. To 
+further guide the response, it could be slightly modified to: "Can you list and briefly explain at least three health 
+benefits of regular exercise?"""
+improvement_content_4 = """Improvement Suggestion: This question generally prompts coherent answers. To enhance it, 
+consider adding: "How do you cope with stress in your daily life, and can you describe how these methods effectively 
+help you manage stress?"""
+improvement_content_5 = """Improvement Suggestion: The question is already conducive to coherent answers. To maintain 
+this quality, it could be rephrased for clarity and depth: "What are the key impacts of climate change on the 
+environment, and how do these effects manifest in different ecological and societal aspects?"""
 
 
 few_shot_examples = [
@@ -62,7 +99,7 @@ few_shot_examples = [
     (user_content_2, assistant_content_2),
     (user_content_3, assistant_content_3),
     (user_content_4, assistant_content_4),
-    (user_content_5, assistant_content_5)
+    (user_content_5, assistant_content_5),
 ]
 
 example_improvement_suggestions = [
@@ -70,7 +107,7 @@ example_improvement_suggestions = [
     (user_content_2, assistant_content_2, improvement_content_2),
     (user_content_3, assistant_content_3, improvement_content_3),
     (user_content_4, assistant_content_4, improvement_content_4),
-    (user_content_5, assistant_content_5, improvement_content_5)
+    (user_content_5, assistant_content_5, improvement_content_5),
 ]
 
 COHERENCE_SJ_PROMPT_TEMPLATE = """System: You are an AI assistant tasked with evaluating the coherence of answers in a 
@@ -261,5 +298,3 @@ Stars:
 Justification: 
 Improvement Suggestion:
 """
-
-
