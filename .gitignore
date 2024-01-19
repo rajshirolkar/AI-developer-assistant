@@ -132,6 +132,10 @@ ENV/
 env.bak/
 venv.bak/
 
+# Log and Data
+log
+evaluation_utils/eval_copilot/log
+
 # Spyder project settings
 .spyderproject
 .spyproject

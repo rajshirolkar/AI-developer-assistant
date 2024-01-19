@@ -5,6 +5,7 @@ from fastapi.params import Form
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
+from evaluation_utils.eval_copilot import eval_copilot_log
 import openai
 import os
 from dotenv import load_dotenv
@@ -95,6 +96,7 @@ async def use_evaluation_copilot(request: Request, prompt: str = Form(...)):
         "new_evaluation_score": new_evaluation_score,
         "new_evaluation_justification": new_evaluation_justification,
     }
+    out_log.add_line(response_data)
     return templates.TemplateResponse("input_form.html", response_data)
 
 
@@ -163,5 +165,7 @@ async def eval_copilot(request: Request, prompt: str = Form(...)):
 
 if __name__ == "__main__":
     import uvicorn
+    out_log=eval_copilot_log.eval_copilot_log()
+
 
     uvicorn.run("app:app", host="127.0.0.1", port=8000, log_level="info", reload=True)
