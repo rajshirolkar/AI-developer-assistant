@@ -16,31 +16,47 @@
           <h3>Response:</h3>
           <p>{{ response }}</p>
         </div>
-        <div class="evaluation">
-          <h3>Evaluation 1:</h3>
-          <p><h4>Coherence Score:</h4> {{ coherence }}</p>
-          <p><strong>Justification:</strong> {{ justification }}</p>
-          <p>
-            <strong>Improvement Suggestion:</strong> {{ improvement_suggestion
-            }}
-          </p>
+
+        <div class="evaluations">
+          <!-- eval 1 -->
+          <div class="eval-card">
+            <div class="score">
+              <h4>Relevence Score:</h4>
+              <p>{{ coherence }}</p>
+            </div>
+            <div class="justification-container">
+              <button class="toggle-justifications">Why this score?</button>
+              <p class="justification" style="display: none;">
+                <strong>Justification:</strong> {{ justification }}
+              </p>
+            </div>
+
+            <div class="suggestion-container">
+                <button class = "toggle-suggestion"> How to get a better score?</button>
+              <p class = "suggestion" style = "display: none;">
+                <strong>Alternative Prompt Suggestion:</strong> {{ improvement_suggestion }}
+              </p>
+            </div>
+            <div class = "preference">
+                <button class = "thumb-up-button"> 👍 </button>
+            </div>
+          </div>
+          <!-- eval 2 -->
           <h3>Evaluation 2:</h3>
           <p><strong>Coherence Score:</strong> {{ new_evaluation_score }}</p>
           <p>
             <strong>Justification:</strong> {{ new_evaluation_justification }}
           </p>
         </div>
-        
       </div>
       {% endif %}
       <form action="/use-evaluation-copilot/" method="post">
         <label for="prompt">Enter your text:</label>
         <textarea id="prompt" name="prompt" rows="4" cols="50">
-{{ prompt }}</textarea
-        >
+            {{ prompt }}
+        </textarea>
         <input type="submit" value="Evaluate" />
       </form>
-      
     </div>
   </body>
 </html>
