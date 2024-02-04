@@ -3,60 +3,97 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Text Evaluation</title>
+    <title>GenAI LLM Evaluator</title>
     <link rel="stylesheet" type="text/css" href=".\src\input_form.css" />
     <script src="./src/input_form.js"></script>
   </head>
   <body>
     <div class="container">
-      <h1>GenAI LLM Evaluator</h1>
       {% if coherence %}
       <div class="response_eval">
         <div class="response">
           <h3>Response:</h3>
           <p>{{ response }}</p>
+          
         </div>
 
         <div class="evaluations">
-          <!-- eval 1 -->
+          <!-- eval 1 MSFT score only-->
           <div class="eval-card">
             <div class="score">
-              <h4>Relevence Score:</h4>
+              <h4>Score:</h4>
+              <p>{{ coherence }}</p>
+              <div class="preference">
+                <button id = 'eval-1' class="thumb-up-button">👍</button>
+              </div>
+            </div>
+            
+          </div>
+          <!-- eval 2 word to score + justification + suggestion -->
+          <div class="eval-card">
+            <div class="score">
+              <h4>Score:</h4>
               <p>{{ coherence }}</p>
             </div>
             <div class="justification-container">
-              <button class="toggle-justifications">Why this score?</button>
-              <p class="justification" style="display: none;">
-                <strong>Justification:</strong> {{ justification }}
-              </p>
+              <button class="toggle-justification">Why this score?</button>
+              <div class="justification" style="display: none">
+                <h5>Justification:</h5>
+                {{ justification }}
+              </div>
             </div>
 
             <div class="suggestion-container">
-                <button class = "toggle-suggestion"> How to get a better score?</button>
-              <p class = "suggestion" style = "display: none;">
-                <strong>Alternative Prompt Suggestion:</strong> {{ improvement_suggestion }}
-              </p>
+              <button class="toggle-suggestion">
+                How to get a better score?
+              </button>
+              <div class="suggestion" style="display: none">
+                <h5>Alternative Prompt Suggestion:</h5>
+                <p>{{ improvement_suggestion }}</p>
+              </div>
             </div>
-            <div class = "preference">
-                <button class = "thumb-up-button"> 👍 </button>
+            <div class="preference">
+              <button id = 'eval-2' class="thumb-up-button">👍</button>
             </div>
           </div>
-          <!-- eval 2 -->
-          <h3>Evaluation 2:</h3>
-          <p><strong>Coherence Score:</strong> {{ new_evaluation_score }}</p>
-          <p>
-            <strong>Justification:</strong> {{ new_evaluation_justification }}
-          </p>
+          <!-- eval 3: word to score + integrated metrics + justification-->
+          <div class="eval-card">
+            <div class="score">
+              <h4>Score:</h4>
+              <p>{{ new_evaluation_score }}</p>
+            </div>
+            <div class="justification-container">
+              <button class="toggle-justification">Why this score?</button>
+              <div class="justification" style="display: none">
+                <h5>Justification:</h5>
+                <p>{{ new_evaluation_justification }}</p>
+              </div>
+            </div>
+            <!-- <div class="suggestion-container">
+              <button class="toggle-suggestion">
+                How to get a better score?
+              </button>
+              <div class="suggestion" style="display: none">
+                <h5>Alternative Prompt Suggestion:</h5>
+              </div>
+            </div> -->
+            <div class="preference">
+              <button id = 'eval-3' class="thumb-up-button">👍</button>
+            </div>
+          </div>
         </div>
       </div>
       {% endif %}
-      <form action="/use-evaluation-copilot/" method="post">
-        <label for="prompt">Enter your text:</label>
-        <textarea id="prompt" name="prompt" rows="4" cols="50">
+      <div class="input-box">
+        <form action="/use-evaluation-copilot/" method="post">
+          <label for="prompt">Enter your prompt:</label>
+          <textarea id="prompt" name="prompt" rows="4" cols="50">
             {{ prompt }}
-        </textarea>
-        <input type="submit" value="Evaluate" />
-      </form>
+        </textarea
+          >
+          <input type="submit" value="Submit" />
+        </form>
+      </div>
     </div>
   </body>
 </html>
