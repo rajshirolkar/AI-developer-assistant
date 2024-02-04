@@ -1,68 +1,148 @@
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .response_eval {
-            display: flex;
-        }
-        .response{
-            width:70%
-        }
-        .evaluation{
-            width:30%
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        form {
-            margin-top: 30px;
-        }
-        label {
-            margin-top: 10px;
-            display: block;
-            color: #666;
-        }
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            box-sizing: border-box;
-            height: 100px;
-            resize: vertical;
-        }
-        input[type=submit] {
-            width: 100%;
-            padding: 10px;
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        input[type=submit]:hover {
-            background-color: #216f21;
-        }
-        .scores {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #eee;
-            border-left: 3px solid #5cb85c;
-        }
-        .scores p {
-            margin: 0;
-            padding: 5px 0;
-        }
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.response_eval {
+  display: flex;
+  max-height: 100vh;
+  overflow: hidden;
+}
+.response {
+  flex: 1;
+  padding: 20px;
+}
+.evaluations {
+  width: 40%;
+  overflow-y: auto;
+  max-height: 100vh;
+  padding: 20px;
+}
+
+.eval-card {
+  background-color: #f9f9f9; /* Light grey background for contrast */
+  border: 1px solid #ddd; /* Subtle border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+  padding: 15px; /* Spacing inside the card */
+  margin: 20px 0; /* Space between cards */
+}
+.justification-container,
+.suggestion-container {
+  margin-top: 10px; /* Space above justification and suggestion sections */
+}
+.preference {
+  margin-top: 10px; /* Space above the preference section */
+}
+
+.score,
+.justification,
+.suggestion {
+  margin: 10px 0 15px 0; /* Spacing between elements inside the card */
+}
+
+.justification,
+.suggestion {
+  background-color: #ffffff; /* White background for content areas */
+  border: 1px solid #eee; /* Light border for content areas */
+  border-radius: 5px; /* Rounded corners for content areas */
+  padding: 10px; /* Padding inside content areas */
+}
+
+.toggle-justification,
+.toggle-suggestion,
+.toggle-details,
+.thumb-up-button {
+  background-color: #007bff; /* Primary color for buttons */
+  color: white; /* Text color for buttons */
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 5px; /* Space between buttons */
+  transition: background-color 0.2s ease; /* Smooth background color transition */
+}
+
+.toggle-justification:hover,
+.toggle-suggestion:hover,
+.toggle-details:hover,
+.thumb-up-button:hover {
+  background-color: #0056b3; /* Darker shade on hover for buttons */
+}
+
+.preference {
+  margin-top: 10px; /* Space above the preference section */
+}
+.thumb-up-button {
+  background-color: grey; /* Default background color */
+  border: none; /* Removes the border */
+  padding: 5px 5px; /* Reduced padding around the text for a smaller button */
+  font-size: 12px; /* Smaller font size */
+  cursor: pointer; /* Changes the mouse cursor to a pointer */
+  transition: background-color 0.3s; /* Smooth transition for background color change */
+  display: inline-block; /* Ensures the width and height properties are respected */
+  width: auto; /* Adjusts width based on content, or set a specific width if preferred */
+  height: auto; /* Adjusts height based on content, or set a specific height if preferred */
+  border-radius: 50%;
+}
+
+.thumb-up-button.active {
+  background-color: green; /* Background color for the active/toggled state */
+}
+
+h1 {
+  color: #333;
+  text-align: center;
+}
+form {
+  margin-top: 30px;
+}
+label {
+  margin-top: 10px;
+  display: block;
+  color: #666;
+}
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
+  height: 100px;
+  resize: vertical;
+}
+input[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  background-color: #5cb85c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+input[type="submit"]:hover {
+  background-color: #216f21;
+}
+.scores {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #eee;
+  border-left: 3px solid #5cb85c;
+}
+.scores p {
+  margin: 0;
+  padding: 5px 0;
+}
