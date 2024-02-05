@@ -2,74 +2,294 @@
 
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>GenAI LLM Evaluator</title>
-    <link rel="stylesheet" type="text/css" href=".\src\input_form.css" />
-    <script src="./src/input_form.js"></script>
-  </head>
-  <body>
-    <div class="container">
-      {% if coherence %}
-      <div class="response_eval">
-        <div class="response">
-          <h3>Response:</h3>
-          <p>{{ response }}</p>
-          
-        </div>
 
-        <div class="evaluations">
-          <!-- eval 1 MSFT score only-->
-          <div class="eval-card">
-            <div class="score">
-              <h4>Score:</h4>
-              <p>{{ coherence }}</p>
-              <div class="preference">
-                <button id = 'eval-1' class="thumb-up-button">👍</button>
-              </div>
-            </div>
-            
-          </div>
-          <!-- eval 2 word to score + justification + suggestion -->
-          <div class="eval-card">
-            <div class="score">
-              <h4>Score:</h4>
-              <p>{{ coherence }}</p>
-            </div>
-            <div class="justification-container">
-              <button class="toggle-justification">Why this score?</button>
-              <div class="justification" style="display: none">
-                <h5>Justification:</h5>
-                {{ justification }}
-              </div>
-            </div>
+<head>
+  <title>GenAI LLM Evaluator</title>
+  <!-- <link rel="stylesheet" type="text/css" href="./src/input_form.css" /> -->
+  <!-- <script src="./src/input_form.js"></script> -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
 
-            <div class="suggestion-container">
-              <button class="toggle-suggestion">
-                How to get a better score?
-              </button>
-              <div class="suggestion" style="display: none">
-                <h5>Alternative Prompt Suggestion:</h5>
-                <p>{{ improvement_suggestion }}</p>
-              </div>
-            </div>
+    .container {
+      max-width: 70%;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .response_eval {
+      display: flex;
+      max-height: 100vh;
+      overflow: hidden;
+    }
+
+    .response {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .evaluations {
+      width: 40%;
+      overflow-y: auto;
+      max-height: 100vh;
+      padding: 20px;
+    }
+
+    .eval-card {
+      background-color: #f9f9f9;
+      /* Light grey background for contrast */
+      border: 1px solid #ddd;
+      /* Subtle border */
+      border-radius: 8px;
+      /* Rounded corners */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      /* Soft shadow for depth */
+      padding: 15px;
+      /* Spacing inside the card */
+      margin: 20px 0;
+      /* Space between cards */
+    }
+
+    .justification-container,
+    .suggestion-container {
+      margin-top: 10px;
+      /* Space above justification and suggestion sections */
+    }
+
+    .preference {
+      margin-top: 10px;
+      /* Space above the preference section */
+    }
+
+    .score,
+    .justification,
+    .suggestion {
+      margin: 10px 0 15px 0;
+      /* Spacing between elements inside the card */
+    }
+
+    .justification,
+    .suggestion {
+      background-color: #ffffff;
+      /* White background for content areas */
+      border: 1px solid #eee;
+      /* Light border for content areas */
+      border-radius: 5px;
+      /* Rounded corners for content areas */
+      padding: 10px;
+      /* Padding inside content areas */
+    }
+
+    .toggle-justification,
+    .toggle-suggestion,
+    .toggle-details,
+    .thumb-up-button {
+      background-color: #007bff;
+      /* Primary color for buttons */
+      color: white;
+      /* Text color for buttons */
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 5px;
+      /* Space between buttons */
+      transition: background-color 0.2s ease;
+      /* Smooth background color transition */
+    }
+
+    .toggle-justification:hover,
+    .toggle-suggestion:hover,
+    .toggle-details:hover,
+    .thumb-up-button:hover {
+      background-color: #0056b3;
+      /* Darker shade on hover for buttons */
+    }
+
+    .preference {
+      margin-top: 10px;
+      /* Space above the preference section */
+    }
+
+    .thumb-up-button {
+      background-color: grey;
+      /* Default background color */
+      border: none;
+      /* Removes the border */
+      padding: 5px 5px;
+      /* Reduced padding around the text for a smaller button */
+      font-size: 12px;
+      /* Smaller font size */
+      cursor: pointer;
+      /* Changes the mouse cursor to a pointer */
+      transition: background-color 0.3s;
+      /* Smooth transition for background color change */
+      display: inline-block;
+      /* Ensures the width and height properties are respected */
+      width: auto;
+      /* Adjusts width based on content, or set a specific width if preferred */
+      height: auto;
+      /* Adjusts height based on content, or set a specific height if preferred */
+      border-radius: 50%;
+    }
+
+    .thumb-up-button.active {
+      background-color: green;
+      /* Background color for the active/toggled state */
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    form {
+      margin-top: 30px;
+    }
+
+    label {
+      margin-top: 10px;
+      display: block;
+      color: #666;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+      height: 100px;
+      resize: vertical;
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #5cb85c;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #216f21;
+    }
+
+    .scores {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #eee;
+      border-left: 3px solid #5cb85c;
+    }
+
+    .scores p {
+      margin: 0;
+      padding: 5px 0;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // toggle buttons
+      document.querySelectorAll('.toggle-justification, .toggle-suggestion').forEach(button => {
+        button.addEventListener('click', function () {
+          // find the closest parent .eval-card
+          const parentCard = this.closest('.eval-card');
+          // determine which class to toggle based on the clicked button
+          const classToToggle = this.classList.contains('toggle-justification') ? '.justification' : '.suggestion';
+          const elementToToggle = parentCard.querySelector(classToToggle);
+          console.log(elementToToggle)
+          elementToToggle.style.display = elementToToggle.style.display === 'none' ? 'block' : 'none';
+        });
+      });
+
+      document.querySelectorAll('.thumb-up-button').forEach(button => {
+        button.addEventListener('click', function () {
+          // Toggle the "active" class each time the button is clicked
+          this.classList.toggle('active');
+          // thumbs=up preference
+          // todo #3
+        });
+      });
+
+    })
+  </script>
+</head>
+
+<body>
+  <div class="container">
+    {% if coherence %}
+    <div class="response_eval">
+      <div class="response">
+        <h3>Response:</h3>
+        <p>{{ response }}</p>
+
+      </div>
+
+      <div class="evaluations">
+        <!-- eval 1 MSFT score only-->
+        <div class="eval-card">
+          <div class="score">
+            <h4>Score:</h4>
+            <p>{{ coherence }}</p>
             <div class="preference">
-              <button id = 'eval-2' class="thumb-up-button">👍</button>
+              <button id='eval-1' class="thumb-up-button">👍</button>
             </div>
           </div>
-          <!-- eval 3: word to score + integrated metrics + justification-->
-          <div class="eval-card">
-            <div class="score">
-              <h4>Score:</h4>
-              <p>{{ new_evaluation_score }}</p>
+
+        </div>
+        <!-- eval 2 word to score + justification + suggestion -->
+        <div class="eval-card">
+          <div class="score">
+            <h4>Score:</h4>
+            <p>{{ coherence }}</p>
+          </div>
+          <div class="justification-container">
+            <button class="toggle-justification">Why this score?</button>
+            <div class="justification" style="display: block">
+              <h5>Justification:</h5>
+              {{ justification }}
             </div>
-            <div class="justification-container">
-              <button class="toggle-justification">Why this score?</button>
-              <div class="justification" style="display: none">
-                <h5>Justification:</h5>
-                <p>{{ new_evaluation_justification }}</p>
-              </div>
+          </div>
+
+          <div class="suggestion-container">
+            <button class="toggle-suggestion">
+              How to get a better score?
+            </button>
+            <div class="suggestion" style="display: block">
+              <h5>Alternative Prompt Suggestion:</h5>
+              <p>{{ improvement_suggestion }}</p>
             </div>
-            <!-- <div class="suggestion-container">
+          </div>
+          <div class="preference">
+            <button id='eval-2' class="thumb-up-button">👍</button>
+          </div>
+        </div>
+        <!-- eval 3: word to score + integrated metrics + justification-->
+        <div class="eval-card">
+          <div class="score">
+            <h4>Score:</h4>
+            <p>{{ new_evaluation_score }}</p>
+          </div>
+          <div class="justification-container">
+            <button class="toggle-justification">Why this score?</button>
+            <div class="justification" style="display: none">
+              <h5>Justification:</h5>
+              <p>{{ new_evaluation_justification }}</p>
+            </div>
+          </div>
+          <!-- <div class="suggestion-container">
               <button class="toggle-suggestion">
                 How to get a better score?
               </button>
@@ -77,23 +297,22 @@
                 <h5>Alternative Prompt Suggestion:</h5>
               </div>
             </div> -->
-            <div class="preference">
-              <button id = 'eval-3' class="thumb-up-button">👍</button>
-            </div>
+          <div class="preference">
+            <button id='eval-3' class="thumb-up-button">👍</button>
           </div>
         </div>
       </div>
-      {% endif %}
-      <div class="input-box">
-        <form action="/use-evaluation-copilot/" method="post">
-          <label for="prompt">Enter your prompt:</label>
-          <textarea id="prompt" name="prompt" rows="4" cols="50">
-            {{ prompt }}
-        </textarea
-          >
-          <input type="submit" value="Submit" />
-        </form>
-      </div>
     </div>
-  </body>
+    {% endif %}
+    <div class="input-box">
+      <form action="/use-evaluation-copilot/" method="post">
+        <label for="prompt">Enter your prompt:</label>
+        <textarea id="prompt" name="prompt" rows="4" cols="50">{{ prompt }}
+        </textarea>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+  </div>
+</body>
+
 </html>
