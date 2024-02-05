@@ -257,7 +257,7 @@
           </div>
           <div class="justification-container">
             <button class="toggle-justification">Why this score?</button>
-            <div class="justification" style="display: block">
+            <div class="justification" style="display: none">
               <h5>Justification:</h5>
               {{ justification }}
             </div>
@@ -267,8 +267,8 @@
             <button class="toggle-suggestion">
               How to get a better score?
             </button>
-            <div class="suggestion" style="display: block">
-              <h5>Improvement Suggestion:</h5>
+            <div class="suggestion" style="display: none">
+              <h5>Prompt Improvement Suggestion:</h5>
               <p>{{ improvement_suggestion }}</p>
             </div>
           </div>
@@ -294,7 +294,7 @@
                 How to get a better score?
               </button>
               <div class="suggestion" style="display: none">
-                <h5>Improvement Suggestion:</h5>
+                <h5>Alternative Prompt Suggestion:</h5>
                 <p>{{ new_evaluation_improvement_suggestion }}</p>
               </div>
             </div>
