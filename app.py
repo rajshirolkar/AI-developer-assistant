@@ -31,7 +31,7 @@ load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 client = openai.Client()
 templates = Jinja2Templates(directory="templates")
-
+out_log = eval_copilot_log.eval_copilot_log()
 app = FastAPI()
 
 
