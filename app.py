@@ -3,7 +3,9 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.logger import logger
 from fastapi.params import Form
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import RedirectResponse,HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from evaluation_utils.eval_copilot import eval_copilot_log
 import openai
@@ -33,6 +35,7 @@ client = openai.Client()
 templates = Jinja2Templates(directory="templates")
 out_log = eval_copilot_log.eval_copilot_log()
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -161,6 +164,13 @@ async def eval_copilot(request: Request, prompt: str = Form(...)):
         ),
     )
     return evaluation_data
+
+
+@app.get('/thumb_click')
+async def thumb_click(button_number: int):
+
+    out_log.add_thumb(str(button_number))
+    return RedirectResponse(url="/", status_code=303)
 
 
 if __name__ == "__main__":

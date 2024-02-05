@@ -1,6 +1,7 @@
 import os
 import csv
 import datetime
+from . import eval_copilot_log_utils
 
 class eval_copilot_log:
     def __init__(self,auto_flush=True):
@@ -8,13 +9,18 @@ class eval_copilot_log:
         self._init_path()
         self.auto_flush=auto_flush
         self.log=[]
+        self.waitfor_thumb=False
+
 
 
     def _init_path(self):
         os.makedirs(self.directory,exist_ok=True)
+        now_time = datetime.datetime.now()
+        self.log_file_path=now_time.strftime("%Y%m%d-%H%M%S")+".csv"
 
 
     def save_dict_log(self,file_name,dict_log):
+        dict_log[0]["thumb"]=""
         keywords=dict_log[0].keys()
 
         file_path=os.path.join(self.directory,file_name)
@@ -33,15 +39,25 @@ class eval_copilot_log:
     def add_line(self,data):
         if self.auto_flush:
             self.log=[data]
-            now_time=datetime.datetime.now()
-            self.save_dict_log(now_time.strftime("%Y%m%d-%H%M%S")+".csv",self.log)
+            self.save_dict_log(self.log_file_path,self.log)
+            self.waitfor_thumb=True
 
         else:
             print("Error: auto_flush is set to False, not implemented yet")
+    def add_thumb(self,thumb):
+        print("writing to log", thumb)
+        if self.waitfor_thumb:
+            eval_copilot_log_utils.append_thumb(os.path.join(self.directory,self.log_file_path),thumb)
+            self.waitfor_thumb=False
+        else:
+            print("Error: add_thumb called without previous add_line")
+
+
 
 if __name__=="__main__":
     log=eval_copilot_log()
     log.add_line({"a":1,"b":2,"c":3})
+    log.add_line({"a": 1, "b": 2, "d": 3})
 
 
 

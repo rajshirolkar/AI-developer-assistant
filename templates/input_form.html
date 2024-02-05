@@ -224,7 +224,8 @@
       });
 
     })
-  </script>
+    </script>
+    <script src="/static/js/record.js"></script>
 </head>
 
 <body>
@@ -244,7 +245,7 @@
             <h4>Score:</h4>
             <p>{{ coherence }}</p>
             <div class="preference">
-              <button id='eval-1' class="thumb-up-button">👍</button>
+              <button id='eval-1' class="thumb-up-button" onclick="sendThumbClick(1)">👍</button>
             </div>
           </div>
 
@@ -273,7 +274,7 @@
             </div>
           </div>
           <div class="preference">
-            <button id='eval-2' class="thumb-up-button">👍</button>
+            <button id='eval-2' class="thumb-up-button" onclick="sendThumbClick(2)">👍</button>
           </div>
         </div>
         <!-- eval 3: word to score + integrated metrics + justification-->
@@ -298,7 +299,7 @@
               </div>
             </div> -->
           <div class="preference">
-            <button id='eval-3' class="thumb-up-button">👍</button>
+            <button id='eval-3' class="thumb-up-button" onclick="sendThumbClick(3)">👍</button>
           </div>
         </div>
       </div>
