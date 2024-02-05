@@ -47,8 +47,8 @@ class ImprovementCopilot(EvaluationCopilot):
         score, justification = self.get_score_and_justification(
             user_prompt, llm_response
         )
-        # print("Score:", score)
-        # print("Justification:", justification)
+        print("Score:", score)
+        print("Justification:", justification)
         extended_user_prompt = f"Question: {user_prompt}\nAnswer: {llm_response}\nStars: {score}\nJustification: {justification}"
         print("Extended User Prompt:", extended_user_prompt)
         messages = self.__create_improvement_messages(extended_user_prompt)

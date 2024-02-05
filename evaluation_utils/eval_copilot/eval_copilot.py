@@ -8,6 +8,7 @@ from evaluation_utils.eval_copilot.copilot_utils import (
     create_message,
     run_chat_completions,
     parse_score_and_justification,
+    parse_score_and_justification_words,
 )
 
 
@@ -58,6 +59,44 @@ class EvaluationCopilot:
         full_response = run_chat_completions(messages)
         print("Full Response:", full_response)
         return parse_score_and_justification(full_response)
+
+
+class EvaluationCopilotNew:
+    def __init__(self, evaluation_prompt):
+        self.system_prompt = evaluation_prompt["system"]
+        self.user_instructions = evaluation_prompt["user"]
+        self.example_evaluations = self.__format_examples(evaluation_prompt["examples"])
+
+    def __format_examples(self, examples):
+        formatted_examples = []
+        for example in examples:
+            user = f"Context: {example['context']}\nQuestion: {example['question']}\nAnswer: {example['answer']}"
+            assistant = f"Stars: {example['stars']}"
+            if "justification" in example:
+                assistant += f"\nJustification: {example['justification']}"
+            formatted_examples.append((user, assistant))
+        return formatted_examples
+
+    def __create_evaluation_messages(self, user_prompt):
+        messages = [create_message("system", self.system_prompt)]
+
+        if self.user_instructions:
+            messages.append(create_message("user", self.user_instructions))
+        for user, assistant in self.example_evaluations:
+            messages.append(create_message("user", user))
+            messages.append(create_message("assistant", assistant))
+
+        messages.append(create_message("user", user_prompt))
+        return messages
+
+    def get_score_and_justification(self, context, user_prompt, llm_response):
+        prompt_and_response = (
+            f"Context: {context}\nQuestion:{user_prompt}\nAnswer:{llm_response}"
+        )
+        messages = self.__create_evaluation_messages(prompt_and_response)
+        full_response = run_chat_completions(messages)
+        print("Full Response:", full_response)
+        return parse_score_and_justification_words(full_response)
 
 
 def get_eval_score(client, user_prompt, response, prompt_template):
