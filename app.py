@@ -202,4 +202,4 @@ if __name__ == "__main__":
 
     out_log = eval_copilot_log.eval_copilot_log()
 
-    uvicorn.run("app:app", host="127.0.0.1", port=8000, log_level="info",Reload=True)
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, log_level="info")
