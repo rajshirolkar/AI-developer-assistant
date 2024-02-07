@@ -9,7 +9,7 @@
 
 function sendThumbClick(buttonNumber) {
     fetch('/thumb_click', {
-        method: 'GET',
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },

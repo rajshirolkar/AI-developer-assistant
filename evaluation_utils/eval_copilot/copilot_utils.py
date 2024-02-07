@@ -17,7 +17,9 @@ def create_message(role, content):
 
 
 def run_chat_completions(messages):
-    response = client.chat.completions.create(model="gpt-3.5-turbo", messages=messages)
+    response = client.chat.completions.create(
+        model="gpt-4-1106-preview", messages=messages
+    )
     return response.choices[0].message.content
 
 
@@ -34,13 +36,34 @@ def parse_score_and_justification(full_response):
     return score, justification
 
 
+def parse_score_and_justification_words(full_response):
+    score_map = {
+        "Very Bad": "1",
+        "Bad": "2",
+        "Average": "3",
+        "Good": "4",
+        "Very Good": "5",
+    }
+
+    score_match = re.search(
+        r"Stars:\s*(Very Bad|Bad|Average|Good|Very Good)\s*", full_response, re.DOTALL
+    )
+    justification_match = re.search(r"Justification:\s*(.+)", full_response, re.DOTALL)
+
+    score = score_map[score_match.group(1)] if score_match else "0"
+    justification = (
+        justification_match.group(1).strip()
+        if justification_match
+        else "No justification provided."
+    )
+    return score, justification
+
+
 def parse_improvement_suggestion(full_response):
     improvement_match = re.search(
         r"Improvement Suggestion:\s*(.+)", full_response, re.DOTALL
     )
     improvement_suggestion = (
-        improvement_match.group(1).strip()
-        if improvement_match
-        else "No improvement suggestion provided."
+        improvement_match.group(1).strip() if improvement_match else full_response
     )
     return improvement_suggestion

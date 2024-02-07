@@ -41,16 +41,15 @@ class eval_copilot_log:
             self.log=[data]
             self.save_dict_log(self.log_file_path,self.log)
             self.waitfor_thumb=True
-
         else:
             print("Error: auto_flush is set to False, not implemented yet")
+
     def add_thumb(self,thumb):
-        print("writing to log", thumb)
         if self.waitfor_thumb:
             eval_copilot_log_utils.append_thumb(os.path.join(self.directory,self.log_file_path),thumb)
             self.waitfor_thumb=False
         else:
-            print("Error: add_thumb called without previous add_line")
+            print("Warning: (ignoring action) add_thumb called without previous add_line")
 
 
 

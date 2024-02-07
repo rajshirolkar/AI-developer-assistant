@@ -230,7 +230,7 @@
 
 <body>
   <div class="container">
-    {% if coherence %}
+    {% if score %}
     <div class="response_eval">
       <div class="response">
         <h3>Response:</h3>
@@ -243,7 +243,7 @@
         <div class="eval-card">
           <div class="score">
             <h4>Score:</h4>
-            <p>{{ coherence }}</p>
+            <p>{{ azure_evaluation_score }}</p>
             <div class="preference">
               <button id='eval-1' class="thumb-up-button" onclick="sendThumbClick(1)">👍</button>
             </div>
@@ -254,7 +254,7 @@
         <div class="eval-card">
           <div class="score">
             <h4>Score:</h4>
-            <p>{{ coherence }}</p>
+            <p>{{ score }}</p>
           </div>
           <div class="justification-container">
             <button class="toggle-justification">Why this score?</button>
@@ -269,7 +269,7 @@
               How to get a better score?
             </button>
             <div class="suggestion" style="display: block">
-              <h5>Alternative Prompt Suggestion:</h5>
+              <h5>Improvement Suggestion:</h5>
               <p>{{ improvement_suggestion }}</p>
             </div>
           </div>
@@ -290,14 +290,15 @@
               <p>{{ new_evaluation_justification }}</p>
             </div>
           </div>
-          <!-- <div class="suggestion-container">
+          <div class="suggestion-container">
               <button class="toggle-suggestion">
                 How to get a better score?
               </button>
               <div class="suggestion" style="display: none">
-                <h5>Alternative Prompt Suggestion:</h5>
+                <h5>Improvement Suggestion:</h5>
+                <p>{{ new_evaluation_improvement_suggestion }}</p>
               </div>
-            </div> -->
+            </div>
           <div class="preference">
             <button id='eval-3' class="thumb-up-button" onclick="sendThumbClick(3)">👍</button>
           </div>
@@ -308,8 +309,7 @@
     <div class="input-box">
       <form action="/use-evaluation-copilot/" method="post">
         <label for="prompt">Enter your prompt:</label>
-        <textarea id="prompt" name="prompt" rows="4" cols="50">{{ prompt }}
-        </textarea>
+        <textarea id="prompt" name="prompt" rows="4" cols="50">{{ prompt }}</textarea>
         <input type="submit" value="Submit" />
       </form>
     </div>

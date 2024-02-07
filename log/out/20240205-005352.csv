@@ -1,0 +1,6 @@
+request,prompt,response,coherence,justification,improvement_suggestion,new_evaluation_score,new_evaluation_justification,thumb
+<starlette.requests.Request object at 0x0000019F186BF090>,        test,Hello! How can I assist you today?,5.0,"The answer has perfect coherency. Although the response is brief, it directly responds to the prompt 
+by acknowledging the test and offering assistance. The coherence is exhibited through a clear and logical flow of 
+thought.","The question lacks clarity and specificity. For clearer results, 
+consider replacing the placeholder ""test"" with a more specific prompt related to the desired information or task.",5.0,"The response provided by the LLM is highly coherent and relevant to the question asked. Although it is a brief response, it directly addresses the question and demonstrates a clear understanding of the task. The ideas are presented logically and there is a clear flow in the response. There are no contradictory or unrelated statements present in the text. Overall, the response exhibits excellent coherence and structure, making it easy to understand and follow.",
+,,,,,,,,3
