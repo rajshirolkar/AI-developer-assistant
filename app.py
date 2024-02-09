@@ -73,6 +73,13 @@ To diagnose allergies, allergists may perform skin tests or blood tests. Treatme
 To reduce exposure to allergens, individuals should monitor daily pollen and mold spore levels, start medications before allergy season, keep windows and doors shut, wear a hat outdoors, change clothes after being outside, and avoid activities that trigger allergies or wear a mask if necessary.
 """
 
+system_prompt_ground_truth = """
+You are a helpful assistant. You will be given a groundtruth and a prompt. Your job is to provide a response that is relevant to the groundtruth and prompt.
+
+Ground Truth:
+{ground_truth}
+"""
+
 improvement_copilot = ImprovementCopilotNew(relevance_improvement_prompts)
 
 
@@ -84,7 +91,8 @@ async def use_evaluation_copilot(request: Request, prompt: str = Form(...)):
     # Generate the response from OpenAI
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}]
+            model="gpt-3.5-turbo", messages=[{"role": "system", "content": system_prompt_ground_truth.format(ground_truth=ground_truth)},
+                                     {"role": "user", "content": prompt}]
         )
         generated_text = response.choices[0].message.content
     except Exception as e:
@@ -96,7 +104,8 @@ async def use_evaluation_copilot(request: Request, prompt: str = Form(...)):
             context=ground_truth, question=prompt, answer=response
         ),
     )
-    azure_eval_score = run_chat_completions([azure_eval_msg])
+    azure_eval_score_response = run_chat_completions([azure_eval_msg])
+    azure_eval_score = azure_eval_score_response.split("tars:")[1].strip()
 
     (
         eval1_score,
