@@ -1,9 +1,0 @@
-request,prompt,response,coherence,justification,improvement_suggestion,new_evaluation_score,new_evaluation_justification,thumb
-<starlette.requests.Request object at 0x0000022D3A9EEC90>,test        ,"I am sorry, but I cannot conduct a test as I am an AI language model.",5.0,"The answer has perfect coherency. It directly addresses the question by stating that the AI cannot 
-conduct a test as it is an AI language model. The response is concise, clear, and maintains a logical flow, making it a 
-coherent answer.","The question lacks clarity and doesn't provide enough information for 
-the AI to generate a specific response. To improve this prompt, consider providing more context or specifying the 
-type of test you are referring to. For example: ""Can you help me with an English grammar test?"" or ""What are some 
-common features of psychological tests?"" This will help guide the AI in providing a more coherent and relevant 
-answer.",5.0,"The response has a high coherence score of 5. The response is clear, concise, and directly addresses the question asked. It is logical and consistent, providing a straightforward explanation that the AI language model cannot conduct a test. There are no unrelated or contradictory statements present in the response. The text is well-structured and provides a seamless reading experience.",
-,,,,,,,,3

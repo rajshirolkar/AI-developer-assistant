@@ -36,8 +36,12 @@ from evaluation_utils.eval_copilot.generic_evaluation import (
 )
 from evaluation_utils.eval_copilot.improvement_copilot import ImprovementCopilot
 from evaluation_utils.eval_copilot.relevance_evaluation import (
-    ImprovementCopilotNew,
+    ImprovementCopilotNew as RelevanceImprovementCopilotNew,
     relevance_improvement_prompts,
+)
+from evaluation_utils.eval_copilot.simplicity_evaluation import (
+    ImprovementCopilotNew as SimplicityImprovementCopilotNew,
+    simplicity_improvement_prompts,
 )
 from models.evaluation_models import CopilotEvaluationResponse, CopilotEvaluation
 from models.prompt_models import GenerationResponse
@@ -80,7 +84,8 @@ Ground Truth:
 {ground_truth}
 """
 
-improvement_copilot = ImprovementCopilotNew(relevance_improvement_prompts)
+improvement_copilot = RelevanceImprovementCopilotNew(relevance_improvement_prompts)
+simplicity_improvement_copilot = SimplicityImprovementCopilotNew(simplicity_improvement_prompts)
 
 
 @app.post("/use-evaluation-copilot/", response_model=CoherenceEvaluation)
@@ -114,6 +119,16 @@ async def use_evaluation_copilot(request: Request, prompt: str = Form(...)):
     ) = improvement_copilot.get_improvement_suggestion(
         ground_truth, prompt, generated_text
     )
+
+    (
+        eval_simplicity_score,
+        eval_simplicity_justification,
+        eval_simplicity_improvement_suggestion,
+    ) = simplicity_improvement_copilot.get_improvement_suggestion(
+        ground_truth, prompt, generated_text
+    )
+
+
     generic_eval = get_generic_evaluation_score(prompt, generated_text, client)
 
     response_data = {
@@ -124,6 +139,9 @@ async def use_evaluation_copilot(request: Request, prompt: str = Form(...)):
         "score": eval1_score,
         "justification": eval1_justification,
         "improvement_suggestion": eval1_improvement_suggestion,
+        "simplicity_score": eval_simplicity_score,
+        "simplicity_justification": eval_simplicity_justification,
+        "simplicity_improvement_suggestion": eval_simplicity_improvement_suggestion,
         "new_evaluation_score": generic_eval["rating"],
         "new_evaluation_justification": generic_eval["explanation"],
         "new_evaluation_improvement_suggestion": generic_eval[

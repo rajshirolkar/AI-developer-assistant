@@ -357,11 +357,37 @@
                 <p>{{ improvement_suggestion }}</p>
               </div>
             </div>
-
           </div>
+
+            <!-- eval 4 word to score + justification + suggestion -->
+          <div id='evaluation-4' class="eval-card">
+            <h5>Evaluation 3: Simplicity</h5>
+            <div class="score">
+              <h4>Score:</h4>
+              <p>{{ simplicity_score }}</p>
+            </div>
+            <div class="justification-container">
+              <button class="toggle-justification">Why this score?</button>
+              <div class="justification" style="display: none">
+                <h5>Justification:</h5>
+                {{ simplicity_justification }}
+              </div>
+            </div>
+
+            <div class="suggestion-container">
+              <button class="toggle-suggestion">
+                How to get a better score?
+              </button>
+              <div class="suggestion" style="display: none">
+                <h5>Improvement Suggestion:</h5>
+                <p>{{ simplicity_improvement_suggestion }}</p>
+              </div>
+            </div>
+          </div>
+
           <!-- eval 3: word to score + integrated metrics + justification-->
           <div id='evaluation-3' class="eval-card">
-            <h5>Evaluation 3: General Performance</h5>
+            <h5>Evaluation 4: General Performance</h5>
             <div class="score">
               <h4>Score:</h4>
               <p>{{ new_evaluation_score }}</p>
