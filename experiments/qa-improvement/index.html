@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Bot Interface</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .spinner {
+          border: 4px solid rgba(0, 0, 0, 0.1);
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border-left-color: #09f;
+          animation: spin 1s ease infinite;
+          margin: 20px auto; /* Centers the spinner */
+        }
+        
+        @keyframes spin {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+    </style>
+</head>
+
+
+<body>
+    <div class="container">
+        <h2>QA Bot</h2>
+        <div class="form-group">
+            <label for="promptInput">Enter your prompt:</label>
+            <textarea class="form-control" id="promptInput" rows="3"></textarea>
+        </div>
+        <button id="sendPrompt" class="btn btn-primary">Send Prompt</button>
+        <div id="loadingSpinnerResponse" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+        <hr>
+        <h3>Response</h3>
+        <p id="responseOutput"></p>
+        <button id="evaluateResponse" class="btn btn-secondary">Evaluate Response</button>
+        <div id="loadingSpinnerEvaluation" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+        <hr>
+        <h3>Evaluation Result</h3>
+        <p id="evaluationScore"></p>
+        <p id="evaluationJustification"></p>
+        <!-- ... existing HTML ... -->
+        <button id="improvementSuggestions" class="btn btn-info">Improvement Suggestions</button>
+        <div id="loadingSpinnerImprovement" style="display: none;">
+            <div class="spinner"></div>
+        </div>
+        <hr>
+        <h3>Improvement Results</h3>
+        <div>
+            <h4>Question Improvement</h4>
+            <p id="questionImprovement"></p>
+        </div>
+        <div>
+            <h4>Answer Improvement</h4>
+            <p id="answerImprovement"></p>
+        </div>
+    </div>
+
+    <!-- Bootstrap and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Your JavaScript file -->
+    <script src="qa_bot.js"></script>
+</body>
+</html>
