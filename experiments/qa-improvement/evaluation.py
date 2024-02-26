@@ -63,7 +63,8 @@ improvement_system_prompt_template = """
 You are an expert in assessing AI Question Answer evaluation report. You will be given a short evaluation report of an AI response to a user question, with an
 evaluation report giving you a score the QA pair received and an explanation of why a certain score was given. 
 Based on the evaluation report, you will be required to provide suggestions on some improvements that can be made to the user's question and the AI's response.
-Be as objective as possible and your suggestions should be actionable items in 2-3 bullets that can be quickly glanced over. Give your suggestions by strictly following this format: [[ question improvement suggestion ]], [[ answer improvement suggestion]].,
+Be as objective as possible and your suggestions should be actionable items in 2-3 bullets that can be quickly glanced over. 
+Give your suggestions by strictly following this format: [[ question improvement suggestion ]], [[ answer improvement suggestion]].,
 for example "Question Improvement: [[question improvement suggestion..]], Answer Improvement: [[answer improvement suggestion..]]".
 
 [The Start of Evaluation Report]
@@ -127,3 +128,4 @@ for example "Question Improvement: [[question improvement suggestion..]], Answer
 
 # [The End of Evaluation Report]
 # """
+
