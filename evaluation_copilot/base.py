@@ -1,7 +1,7 @@
 import openai
 import os
 from dotenv import load_dotenv
-from models import EvaluationInput, EvaluationOutput, ImprovementInput, ImprovementOutput  # Import the necessary models
+from evaluation_copilot.models import EvaluationInput, EvaluationOutput, ImprovementInput, ImprovementOutput  # Import the necessary models
 
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
