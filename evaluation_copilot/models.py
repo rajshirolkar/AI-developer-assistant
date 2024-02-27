@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-
+from typing import Optional
 
 class Question(BaseModel):
     question: str
@@ -7,6 +7,7 @@ class Question(BaseModel):
 class EvaluationInput(BaseModel):
     question: str
     answer: str
+    context: Optional[str] = None  # Optional field for reference text
 
 class EvaluationOutput(BaseModel):
     score: int

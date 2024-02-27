@@ -25,18 +25,49 @@ evaluation_system_prompt_template = """
     [The End of Assistant’s Answer]
 """
 
+evaluation_system_prompt_with_context_template = """
+    [System]
+    Please act as an impartial judge and evaluate the quality of the response provided by an
+    AI assistant to the user question displayed below, considering the provided context as the ground truth. Your evaluation should consider factors
+    such as the helpfulness, relevance, accuracy, depth, creativity, and level of detail of
+    the response in relation to the context that was used to give the answer. Begin your evaluation by providing a short explanation. Be as objective and concise as
+    possible using simple language. The explanation should be 2-3 bullet points that are easy to glance over. After providing your explanation, please rate the response on a scale of 1 to 5
+    by strictly following this format: "[[explanation]],  [[rating]]", 
+    for example: "Explanation:[[explanation..]], Rating: [[5]]".
+    [Context]
+    {context}
+    [Question]
+    {question}
+    [The Start of Assistant’s Answer]
+    {answer}
+    [The End of Assistant’s Answer]
+"""
+
 class EvaluationCopilot:
-    def __init__(self, logging=False, prompt_template=evaluation_system_prompt_template):
-        self.prompt_template = prompt_template
+    def __init__(self, logging=False, use_context=False):
         self.logging_enabled = logging
+        self.use_context = use_context  # Store the flag indicating if context should be used
+        # Choose the appropriate template based on whether context is used
+        if use_context:
+            self.prompt_template = evaluation_system_prompt_with_context_template
+        else:
+            self.prompt_template = evaluation_system_prompt_template
 
     def log(self, message):
         if self.logging_enabled:
             print(message)
 
     def evaluate(self, eval_input: EvaluationInput) -> EvaluationOutput:
+        # Check if context is required and if it's missing
+        if self.use_context and (not hasattr(eval_input, 'context') or eval_input.context is None):
+            raise ValueError("Context is required for evaluation but was not provided.")
 
-        prompt = self.prompt_template.format(question=eval_input.question, answer=eval_input.answer)
+        # Adjust the prompt formatting based on whether context is provided
+        if self.use_context:
+            prompt = self.prompt_template.format(context=eval_input.context, question=eval_input.question, answer=eval_input.answer)
+        else:
+            prompt = self.prompt_template.format(question=eval_input.question, answer=eval_input.answer)
+        self.log(f"Prompt: {prompt}")
         response_text = self.chat_complete(prompt)
         rating, explanation = self.parse_response(response_text)
         score = int(rating.strip())
@@ -88,23 +119,69 @@ for example "Question Improvement: [[question improvement suggestion..]], Answer
 [The End of Evaluation Report]
 """
 
+improvement_system_prompt_with_context_template = """
+[System]
+You are an expert in assessing AI Question Answer evaluation report. You will be given a short evaluation report of an AI response to a user question, considering the provided context as the ground truth. The evaluation report gives you a score the QA pair received and an explanation of why a certain score was given. 
+Based on the evaluation report and the context, you will be required to provide suggestions on some improvements that can be made to the user's question, the AI's response, and how the context could better inform the answer.
+Be as objective as possible and your suggestions should be actionable items in 2-3 bullets that can be quickly glanced over. 
+Give your suggestions by strictly following this format: "Question Improvement: [[question improvement suggestion..]], Answer Improvement: [[answer improvement suggestion..]]".
+
+[The Start of Evaluation Report]
+
+[Context]
+{context}
+
+[User's Question]
+{question}
+
+[The Start of Assistant’s Answer]
+{answer}
+[The End of Assistant’s Answer]
+
+[Score]
+{score}
+
+[The Start of Explanation]
+{explanation}
+[The End of Explanation]
+
+[The End of Evaluation Report]
+"""
 
 class ImprovementCopilot:
-    def __init__(self, logging=False, prompt_template=improvement_system_prompt_template):
-        self.prompt_template = prompt_template
+    def __init__(self, logging=False, use_context=False):
         self.logging_enabled = logging
+        self.use_context = use_context
+        if use_context:
+            self.prompt_template = improvement_system_prompt_with_context_template
+        else:
+            self.prompt_template = improvement_system_prompt_template
 
     def log(self, message):
         if self.logging_enabled:
             print(message)
     
     def suggest_improvements(self, improvement_input: ImprovementInput):
-        prompt = self.prompt_template.format(
-            question=improvement_input.question, 
-            answer=improvement_input.answer, 
-            score=improvement_input.score, 
-            explanation=improvement_input.justification
-        )
+        # Check if context is required and if it's missing
+        if self.use_context and (not hasattr(improvement_input, 'context') or improvement_input.context is None):
+            raise ValueError("Context is required for improvement suggestions but was not provided.")
+
+        # Adjust the prompt formatting based on whether context is provided
+        if self.use_context:
+            prompt = self.prompt_template.format(
+                context=improvement_input.context, 
+                question=improvement_input.question, 
+                answer=improvement_input.answer, 
+                score=improvement_input.score, 
+                explanation=improvement_input.justification
+            )
+        else:
+            prompt = self.prompt_template.format(
+                question=improvement_input.question, 
+                answer=improvement_input.answer, 
+                score=improvement_input.score, 
+                explanation=improvement_input.justification
+            )
 
         response_text = self.chat_complete(prompt)
         improvement_output = self.parse_improvement_response(response_text)
@@ -133,30 +210,25 @@ class ImprovementCopilot:
 
 
 
+relevance_evaluation_prompt_template = """
+    [System]
+    Please focus specifically on evaluating the relevance of the AI assistant's response to the user's question, considering the provided context as the ground truth. 
+    Assess whether the response directly addresses the question and is grounded in the context provided. 
+    Begin your evaluation by providing a short explanation focused on the relevance aspect. 
+    Be as objective and concise as possible using simple language. The explanation should be 2-3 bullet points that are easy to glance over. 
+    After providing your explanation, please rate the response on a scale of 1 to 5
+    by strictly following this format: "[[explanation]],  [[rating]]", 
+    for example: "Explanation:[[explanation..]], Rating: [[5]]".
+    [Context]
+    {context}
+    [Question]
+    {question}
+    [The Start of Assistant’s Answer]
+    {answer}
+    [The End of Assistant’s Answer]
+"""
 
-
-
-# Initialize the EvaluationCopilot
-eval_copilot = EvaluationCopilot()
-
-# Create an EvaluationInput instance
-eval_input = EvaluationInput(question="What is the capital of France?", answer="The capital of France is Paris.")
-
-# Use the EvaluationCopilot to evaluate the input
-eval_output = eval_copilot.evaluate(eval_input)
-
-print(f"Score: {eval_output.score}\nJustification: {eval_output.justification}")
-
-# Initialize the ImprovementCopilot
-improvement_copilot = ImprovementCopilot()
-
-# Create an ImprovementInput instance using the output from the evaluation
-improvement_input = ImprovementInput(question=eval_input.question, 
-                                     answer=eval_input.answer, 
-                                     score=eval_output.score, 
-                                     justification=eval_output.justification)
-
-# Use the ImprovementCopilot to suggest improvements
-improvement_output = improvement_copilot.suggest_improvements(improvement_input)
-
-print(f"Question Improvement: {improvement_output.question_improvement}\nAnswer Improvement: {improvement_output.answer_improvement}")
+class RelevanceEvaluationCopilot(EvaluationCopilot):
+    def __init__(self, logging=False):
+        super().__init__(logging=logging, use_context=True)
+        self.prompt_template = relevance_evaluation_prompt_template
