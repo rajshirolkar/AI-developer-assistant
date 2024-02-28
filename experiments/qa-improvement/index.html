@@ -1,37 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QA Bot Interface</title>
+    <title>GenAI LLM Evaluator</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .spinner {
-          border: 4px solid rgba(0, 0, 0, 0.1);
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          border-left-color: #09f;
-          animation: spin 1s ease infinite;
-          margin: 20px auto; /* Centers the spinner */
+        :root {
+            --primary-color: #007ADA;
+            --secondary-color: #F2F8FC;
+            --background-color: #FAFAFA;
+            --section-background-color: #ffffff;
+            --text-color: #333333;
+            --primary-hover-color: #0056b3;
         }
-        
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #09f;
+            animation: spin 1s ease infinite;
+            margin: 20px auto;
+            /* Centers the spinner */
+        }
+
         @keyframes spin {
-          0% {
-            transform: rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg);
-          }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        header {
+            background-color: var(--primary-color);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        #logo {
+            height: 50px;
+            width: auto;
+            margin-right: 20px;
         }
     </style>
 </head>
 
 
 <body>
-    <div class="container">
-        <h2>QA Bot</h2>
+    <header>
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Microsoft_365_Copilot_Icon.svg/2048px-Microsoft_365_Copilot_Icon.svg.png"
+            alt="Logo" id="logo">
+        <h1>GenAI Evaluation CoPilot</h1>
+    </header>
+    <body>
+        <div class="container">
+        <h2>Prompt</h2>
         <div class="form-group">
             <label for="promptInput">Enter your prompt:</label>
             <textarea class="form-control" id="promptInput" rows="3"></textarea>
@@ -67,12 +99,15 @@
             <p id="answerImprovement"></p>
         </div>
     </div>
+    </body>
+    
 
     <!-- Bootstrap and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <!-- Your JavaScript file -->
+    <!-- Our JavaScript file -->
     <script src="qa_bot.js"></script>
 </body>
+
 </html>
