@@ -232,3 +232,108 @@ class RelevanceEvaluationCopilot(EvaluationCopilot):
     def __init__(self, logging=False):
         super().__init__(logging=logging, use_context=True)
         self.prompt_template = relevance_evaluation_prompt_template
+
+
+coherence_evaluation_prompt_template = """
+    [System]
+    Please focus specifically on evaluating the coherence of the AI assistant's response to the user's question{context_clause}. 
+    Assess whether the response is logically structured, clear, and maintains a consistent focus throughout, effectively addressing the user's question. 
+    Begin your evaluation by providing a short explanation focused on the coherence aspect. 
+    Be as objective and concise as possible using simple language. The explanation should be 2-3 bullet points that are easy to glance over. 
+    After providing your explanation, please rate the response on a scale of 1 to 5
+    by strictly following this format: "[[explanation]],  [[rating]]", 
+    for example: "Explanation:[[explanation..]], Rating: [[5]]".
+    {context_section}
+    [Question]
+    {question}
+    [The Start of Assistant’s Answer]
+    {answer}
+    [The End of Assistant’s Answer]
+"""
+
+class CoherenceEvaluationCopilot(EvaluationCopilot):
+    def __init__(self, logging=False, use_context=True):
+        super().__init__(logging=logging, use_context=use_context)
+        self.prompt_template = coherence_evaluation_prompt_template
+
+    def evaluate(self, eval_input: EvaluationInput) -> EvaluationOutput:
+        context_clause = ", considering the provided context as the ground truth" if self.use_context else ""
+        context_section = "[Context]\n    {context}\n" if self.use_context and hasattr(eval_input, 'context') and eval_input.context is not None else ""
+        # Adjust the prompt formatting based on whether context is provided
+        prompt = self.prompt_template.format(
+            context_clause=context_clause,
+            context_section=context_section,
+            question=eval_input.question,
+            answer=eval_input.answer
+        )
+        self.log(f"Prompt: {prompt}")
+        response_text = self.chat_complete(prompt)
+        rating, explanation = self.parse_response(response_text)
+        score = int(rating.strip())
+        evaluation_output = EvaluationOutput(score=score, justification=explanation)
+        return evaluation_output
+
+
+groundedness_evaluation_prompt_template = """
+    [System]
+    Please focus specifically on evaluating the groundedness of the AI assistant's response to the user's question, ensuring that the response is well-grounded in the provided context. 
+    Assess whether the response accurately reflects the information in the context, and if it uses the context to inform and support the answer effectively. 
+    Begin your evaluation by providing a short explanation focused on the groundedness aspect. 
+    Be as objective and concise as possible using simple language. The explanation should be 2-3 bullet points that are easy to glance over. 
+    After providing your explanation, please rate the response on a scale of 1 to 5
+    by strictly following this format: "[[explanation]],  [[rating]]", 
+    for example: "Explanation:[[explanation..]], Rating: [[5]]".
+    [Context]
+    {context}
+    [Question]
+    {question}
+    [The Start of Assistant’s Answer]
+    {answer}
+    [The End of Assistant’s Answer]
+"""
+
+class GroundednessEvaluationCopilot(EvaluationCopilot):
+    def __init__(self, logging=False):
+        # For GroundednessEvaluation, use_context is always True
+        super().__init__(logging=logging, use_context=True)
+        self.prompt_template = groundedness_evaluation_prompt_template
+
+    def evaluate(self, eval_input: EvaluationInput) -> EvaluationOutput:
+        if not hasattr(eval_input, 'context') or eval_input.context is None:
+            raise ValueError("Context is required for groundedness evaluation but was not provided.")
+        
+        prompt = self.prompt_template.format(
+            context=eval_input.context,
+            question=eval_input.question,
+            answer=eval_input.answer
+        )
+        self.log(f"Prompt: {prompt}")
+        response_text = self.chat_complete(prompt)
+        rating, explanation = self.parse_response(response_text)
+        score = int(rating.strip())
+        evaluation_output = EvaluationOutput(score=score, justification=explanation)
+        return evaluation_output
+
+
+fluency_evaluation_prompt_template = """
+    [System]
+    Please focus specifically on evaluating the fluency of the AI assistant's response to the user's question. 
+    Assess how well the generated text adheres to grammatical rules, syntactic structures, and appropriate usage of vocabulary, resulting in linguistically correct and natural-sounding responses. 
+    Consider the quality of individual sentences and whether they are well-written and grammatically correct. 
+    Begin your evaluation by providing a short explanation focused on the fluency aspect. 
+    Be as objective and concise as possible using simple language. The explanation should be 2-3 bullet points that are easy to glance over. 
+    After providing your explanation, please rate the response on a scale of 1 to 5
+    by strictly following this format: "[[explanation]],  [[rating]]", 
+    for example: "Explanation:[[explanation..]], Rating: [[5]]".
+    [Question]
+    {question}
+    [The Start of Assistant’s Answer]
+    {answer}
+    [The End of Assistant’s Answer]
+"""
+
+class FluencyEvaluationCopilot(EvaluationCopilot):
+    def __init__(self, logging=False):
+        # For FluencyEvaluation, use_context is always False
+        super().__init__(logging=logging, use_context=False)
+        self.prompt_template = fluency_evaluation_prompt_template
