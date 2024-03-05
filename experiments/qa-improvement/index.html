@@ -9,6 +9,7 @@
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
       :root {
         --primary-color: #007ada;
@@ -81,12 +82,12 @@
       }
 
       #chat {
-        flex: 3;
+        flex: 2;
         padding: 0px 20px 0px 20px;
         border-right: 2px solid #eeeeee;
       }
       #evaluations {
-        flex: 1;
+        flex: 2;
         max-height: calc(100vh - 60px);
         overflow-y: auto;
         background-color: var(--section-background-color);
@@ -149,9 +150,9 @@
         <hr />
         <h3>Response</h3> 
         <p id="responseOutput"></p>
-        <button id="evaluateResponse" class="btn btn-secondary">
+        <!-- <button id="evaluateResponse" class="btn btn-secondary">
           Evaluate Response
-        </button>
+        </button> -->
         <div id="loadingSpinnerEvaluation" style="display: none">
           <div class="spinner"></div>
         </div>
@@ -163,9 +164,9 @@
           <p id="evaluationScore"></p>
           <p id="evaluationJustification"></p>
           <!-- ... existing HTML ... -->
-          <button id="improvementSuggestions" class="btn btn-info">
+          <!-- <button id="improvementSuggestions" class="btn btn-info">
             Improvement Suggestions
-          </button>
+          </button> -->
           <div id="loadingSpinnerImprovement" style="display: none">
             <div class="spinner"></div>
           </div>

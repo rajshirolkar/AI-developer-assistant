@@ -8,8 +8,6 @@ import os
 load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 client = openai.Client()
-
-# Initializing the copilots
 eval_copilot = EvaluationCopilot(logging=True)
 relevance_eval_copilot = RelevanceEvaluationCopilot(logging=True)
 coherence_eval_copilot = CoherenceEvaluationCopilot(logging=True)
@@ -21,11 +19,18 @@ def get_llm_response(question: str) -> str:
     """
     Function to get the response from an LLM for a given question.
     """
-    response = client.chat.completions.create(
-            model=MODEL, messages=[{"role": "system", "content": question}]
-        )
-    generated_text = response.choices[0].message.content
-    return generated_text
+    try:
+        response = client.chat.completions.create(
+                model=MODEL, messages=[{"role": "system", "content": question}]
+            )
+        generated_text = response.choices[0].message.content
+        return generated_text
+    except openai.error.OpenAIError as e:
+        st.error(f"An error occurred while fetching the LLM response: {e}")
+        return ""
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+        return ""
 
 st.title('Evaluation Copilot Demo')
 
@@ -36,7 +41,7 @@ evaluation_type = st.radio(
 
 context = ""
 # The text area is displayed only if the evaluation type requires context
-if evaluation_type in ('Relevance', 'Coherence', 'Groundedness'):
+if evaluation_type in ('Relevance', 'Groundedness'):
     context = st.text_area("Enter context for evaluation:", value="France is a country in Western Europe known for its cities, history, and landmarks.")
 
 question = st.text_input("Enter your question:", value="What is the capital of France?")
@@ -52,7 +57,7 @@ if submit_button:
 
     # Prepare the evaluation input, including context if required
     eval_input = EvaluationInput(question=question, answer=llm_answer, context=context if context else None)
-    
+
     # Evaluate the LLM response based on the selected evaluation type
     if evaluation_type == 'General':
         eval_output = eval_copilot.evaluate(eval_input)
@@ -64,7 +69,7 @@ if submit_button:
         eval_output = fluency_eval_copilot.evaluate(eval_input)
     elif evaluation_type == 'Groundedness':
         eval_output = groundedness_eval_copilot.evaluate(eval_input)
-    
+
     st.write("## Evaluation", unsafe_allow_html=True)
     st.success(f"Score: {eval_output.score}")
     st.write(f"Justification:\n{eval_output.justification}")

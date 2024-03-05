@@ -82,7 +82,7 @@ class EvaluationCopilot:
         return generated_text
 
     def parse_response(self, response_text):
-        explanation = response_text.split("Explanation:")[1].split("Rating:")[0]
+        explanation = response_text.split("Explanation:")[1].split("Rating:")[0].replace("[[", "").replace("]]", "")
         rating = response_text.split("Rating:")[1].replace("[[", "").replace("]]", "")
         
         self.log(f"Parse Response - Explanation: {explanation.strip()}")
