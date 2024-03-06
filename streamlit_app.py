@@ -50,7 +50,7 @@ if evaluation_type in ('Relevance', 'Groundedness'):
 
 question = st.text_input("Enter your question:", value="What is the capital of France?")
 
-submit_button = st.button("Submit")
+submit_button = st.button("Submit", disabled=(client.api_key == ""))
 
 if submit_button:
     llm_answer = get_llm_response(question)
