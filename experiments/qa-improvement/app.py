@@ -1,7 +1,8 @@
-from evaluation import chat_complete, parse_response, parse_improvement_response, evaluation_system_prompt_template,improvement_system_prompt_template
-from fastapi import FastAPI
-from pydantic import BaseModel
+from enum import Enum
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from evaluation_copilot.models import EvaluationInput, EvaluationOutput, ImprovementOutput, ImprovementInput
+from evaluation_copilot.base import EvaluationCopilot, RelevanceEvaluationCopilot, CoherenceEvaluationCopilot, FluencyEvaluationCopilot, GroundednessEvaluationCopilot, ImprovementCopilot
 
 app = FastAPI()
 
@@ -13,61 +14,60 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Prompt(BaseModel):
-    prompt: str
+class EvaluationType(str, Enum):
+    general = "General"
+    relevance = "Relevance"
+    coherence = "Coherence"
+    fluency = "Fluency"
+    groundedness = "Groundedness"
 
-class EvaluationRequest(BaseModel):
-    prompt: str
-    llm_response: str
+class EvaluationRequest(EvaluationInput):
+    evaluation_type: EvaluationType
 
-class ImprovementRequest(BaseModel):
-    prompt: str
-    llm_response: str
-    rating: int
-    justification: str
+class ImprovementRequest(EvaluationInput, EvaluationOutput):
+    pass
 
+# Initialize the copilots
+eval_copilot = EvaluationCopilot(logging=True)
+relevance_eval_copilot = RelevanceEvaluationCopilot(logging=True)
+coherence_eval_copilot = CoherenceEvaluationCopilot(logging=True)
+fluency_eval_copilot = FluencyEvaluationCopilot(logging=True)
+groundedness_eval_copilot = GroundednessEvaluationCopilot(logging=True)
+improvement_copilot = ImprovementCopilot(logging=True)
 
-@app.post("/your_endpoint")
-async def get_response(prompt: Prompt):
-    # Logic to generate a response
-
-    generated_text = chat_complete(prompt.prompt)
-
-    return {"response": generated_text}
-
-@app.post("/evaluate_endpoint")
+@app.post("/evaluate_endpoint", response_model=EvaluationOutput)
 async def evaluate_response(eval_request: EvaluationRequest):
-    # Logic to evaluate the response
-    evaluation_system_prompt = evaluation_system_prompt_template.format(question=eval_request.prompt, 
-                                                                        answer=eval_request.llm_response)
+    # Select the appropriate EvaluationCopilot based on the evaluation type
+    if eval_request.evaluation_type == EvaluationType.general:
+        copilot = eval_copilot
+    elif eval_request.evaluation_type == EvaluationType.relevance:
+        copilot = relevance_eval_copilot
+    elif eval_request.evaluation_type == EvaluationType.coherence:
+        copilot = coherence_eval_copilot
+    elif eval_request.evaluation_type == EvaluationType.fluency:
+        copilot = fluency_eval_copilot
+    elif eval_request.evaluation_type == EvaluationType.groundedness:
+        copilot = groundedness_eval_copilot
+    else:
+        raise HTTPException(status_code=400, detail="Invalid evaluation type")
 
-    evaluation_response = chat_complete(evaluation_system_prompt)
+    # Logic to evaluate the response based on the evaluation type, context, etc.
+    evaluation_response = copilot.evaluate(eval_request)
+    return evaluation_response
 
-    explanation, improvement_suggestions, rating = parse_response(evaluation_response)
-
-    print("Explanation : ", explanation)
-    print("Improvement Suggestions : ", improvement_suggestions)
-    print("Rating : ", rating)
-    return {"score": rating, "justification": explanation}
-
-
-@app.post("/improvement_suggestions")
+@app.post("/improvement_suggestions", response_model=ImprovementOutput)
 async def get_improvement_suggestions(improvement_request: ImprovementRequest):
-    # Logic to generate improvement suggestions
-    improvement_system_prompt = improvement_system_prompt_template.format(question=improvement_request.prompt, 
-                                                                          answer=improvement_request.llm_response, 
-                                                                          score=improvement_request.rating, 
-                                                                          explanation=improvement_request.justification)
-
-    improvement_response = chat_complete(improvement_system_prompt)
-
-    question_improvement, answer_improvement = parse_improvement_response(improvement_response)
-
-
-    return {"question_improvement": question_improvement,
-            "answer_improvement": answer_improvement}
+    # Logic to generate improvement suggestions based on the evaluation
+    improvement_input = ImprovementInput(
+        question=improvement_request.question,
+        answer=improvement_request.answer,
+        score=improvement_request.score,
+        justification=improvement_request.justification,
+        context=improvement_request.context
+    )
+    improvement_response = improvement_copilot.suggest_improvements(improvement_input)
+    return improvement_response
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app:app", host="127.0.0.1", port=8000, log_level="info", reload=True)
-

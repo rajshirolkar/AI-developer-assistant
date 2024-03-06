@@ -1,11 +1,4 @@
-import openai
-import os
-from dotenv import load_dotenv
-from evaluation_copilot.models import EvaluationInput, EvaluationOutput, ImprovementInput, ImprovementOutput  # Import the necessary models
-
-load_dotenv()
-openai.api_key = os.environ.get("OPENAI_API_KEY")
-client = openai.Client()
+from evaluation_copilot.models import EvaluationInput, EvaluationOutput, ImprovementInput, ImprovementOutput 
 MODEL = "gpt-4-1106-preview"
 
 
@@ -44,7 +37,8 @@ evaluation_system_prompt_with_context_template = """
 """
 
 class EvaluationCopilot:
-    def __init__(self, logging=False, use_context=False):
+    def __init__(self, client, logging=False, use_context=False):
+        self.client = client
         self.logging_enabled = logging
         self.use_context = use_context  # Store the flag indicating if context should be used
         # Choose the appropriate template based on whether context is used
@@ -75,7 +69,7 @@ class EvaluationCopilot:
         return evaluation_output
     
     def chat_complete(self, prompt):
-        response = client.chat.completions.create(
+        response = self.client.chat.completions.create(
                 model=MODEL, messages=[{"role": "system", "content": prompt}]
             )
         generated_text = response.choices[0].message.content
@@ -149,7 +143,8 @@ Give your suggestions by strictly following this format: "Question Improvement: 
 """
 
 class ImprovementCopilot:
-    def __init__(self, logging=False, use_context=False):
+    def __init__(self, client, logging=False, use_context=False):
+        self.client = client
         self.logging_enabled = logging
         self.use_context = use_context
         if use_context:
@@ -201,7 +196,7 @@ class ImprovementCopilot:
         return ImprovementOutput(question_improvement=question_improvement, answer_improvement=answer_improvement)
 
     def chat_complete(self, prompt):
-        response = client.chat.completions.create(
+        response =self.client.chat.completions.create(
                 model=MODEL, messages=[{"role": "system", "content": prompt}]
             )
         generated_text = response.choices[0].message.content
@@ -229,8 +224,8 @@ relevance_evaluation_prompt_template = """
 """
 
 class RelevanceEvaluationCopilot(EvaluationCopilot):
-    def __init__(self, logging=False):
-        super().__init__(logging=logging, use_context=True)
+    def __init__(self, client, logging=False):
+        super().__init__(client, logging=logging, use_context=True)
         self.prompt_template = relevance_evaluation_prompt_template
 
 
@@ -252,8 +247,8 @@ coherence_evaluation_prompt_template = """
 """
 
 class CoherenceEvaluationCopilot(EvaluationCopilot):
-    def __init__(self, logging=False, use_context=True):
-        super().__init__(logging=logging, use_context=use_context)
+    def __init__(self,client, logging=False, use_context=True):
+        super().__init__(client, logging=logging, use_context=use_context)
         self.prompt_template = coherence_evaluation_prompt_template
 
     def evaluate(self, eval_input: EvaluationInput) -> EvaluationOutput:
@@ -293,9 +288,9 @@ groundedness_evaluation_prompt_template = """
 """
 
 class GroundednessEvaluationCopilot(EvaluationCopilot):
-    def __init__(self, logging=False):
+    def __init__(self,client, logging=False):
         # For GroundednessEvaluation, use_context is always True
-        super().__init__(logging=logging, use_context=True)
+        super().__init__(client, logging=logging, use_context=True)
         self.prompt_template = groundedness_evaluation_prompt_template
 
     def evaluate(self, eval_input: EvaluationInput) -> EvaluationOutput:
@@ -333,7 +328,7 @@ fluency_evaluation_prompt_template = """
 """
 
 class FluencyEvaluationCopilot(EvaluationCopilot):
-    def __init__(self, logging=False):
+    def __init__(self,client, logging=False):
         # For FluencyEvaluation, use_context is always False
-        super().__init__(logging=logging, use_context=False)
+        super().__init__(client, logging=logging, use_context=False)
         self.prompt_template = fluency_evaluation_prompt_template
