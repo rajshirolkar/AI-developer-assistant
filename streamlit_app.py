@@ -2,18 +2,21 @@ import streamlit as st
 from evaluation_copilot.base import MODEL, EvaluationCopilot, RelevanceEvaluationCopilot, CoherenceEvaluationCopilot, FluencyEvaluationCopilot, GroundednessEvaluationCopilot, ImprovementCopilot
 from evaluation_copilot.models import EvaluationInput, ImprovementInput
 import openai
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
-openai.api_key = os.environ.get("OPENAI_API_KEY")
 client = openai.Client()
-eval_copilot = EvaluationCopilot(logging=True)
-relevance_eval_copilot = RelevanceEvaluationCopilot(logging=True)
-coherence_eval_copilot = CoherenceEvaluationCopilot(logging=True)
-fluency_eval_copilot = FluencyEvaluationCopilot(logging=True)
-groundedness_eval_copilot = GroundednessEvaluationCopilot(logging=True)
-improvement_copilot = ImprovementCopilot(logging=True)
+
+user_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", value="", type="password")
+if not user_api_key:
+    st.error("Please enter your OpenAI API Key in the sidebar.")
+else:
+    client.api_key = user_api_key
+
+eval_copilot = EvaluationCopilot(client, logging=True)
+relevance_eval_copilot = RelevanceEvaluationCopilot(client, logging=True)
+coherence_eval_copilot = CoherenceEvaluationCopilot(client, logging=True)
+fluency_eval_copilot = FluencyEvaluationCopilot(client, logging=True)
+groundedness_eval_copilot = GroundednessEvaluationCopilot(client, logging=True)
+improvement_copilot = ImprovementCopilot(client, logging=True)
 
 def get_llm_response(question: str) -> str:
     """
@@ -46,16 +49,13 @@ if evaluation_type in ('Relevance', 'Groundedness'):
 
 question = st.text_input("Enter your question:", value="What is the capital of France?")
 
-# Button to handle the submit action
 submit_button = st.button("Submit")
 
 if submit_button:
-    # Get the LLM response
     llm_answer = get_llm_response(question)
     st.write("## LLM Answer", unsafe_allow_html=True)
     st.info(llm_answer)
 
-    # Prepare the evaluation input, including context if required
     eval_input = EvaluationInput(question=question, answer=llm_answer, context=context if context else None)
 
     # Evaluate the LLM response based on the selected evaluation type
@@ -78,5 +78,10 @@ if submit_button:
     improvement_input = ImprovementInput(question=question, answer=llm_answer, score=eval_output.score, justification=eval_output.justification, context=context if context else None)
     improvement_output = improvement_copilot.suggest_improvements(improvement_input)
     st.write("## Improvement Suggestions", unsafe_allow_html=True)
-    st.warning(f"Question Improvement:\n{improvement_output.question_improvement}")
-    st.warning(f"Answer Improvement:\n{improvement_output.answer_improvement}")
+    if improvement_output.question_improvement:
+        st.markdown("#### Question Improvement", unsafe_allow_html=True)
+        st.markdown(f"> {improvement_output.question_improvement}", unsafe_allow_html=True)
+
+    if improvement_output.answer_improvement:
+        st.markdown("#### Answer Improvement", unsafe_allow_html=True)
+        st.markdown(f"> {improvement_output.answer_improvement}", unsafe_allow_html=True)
