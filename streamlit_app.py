@@ -4,6 +4,7 @@ from evaluation_copilot.models import EvaluationInput, ImprovementInput
 import openai
 
 client = openai.Client()
+client.api_key = ""
 
 user_api_key = st.sidebar.text_input("Enter your OpenAI API Key:", value="", type="password")
 if not user_api_key:
