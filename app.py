@@ -49,12 +49,12 @@ async def get_response(input_data: GetResponseInput):
         raise HTTPException(status_code=500, detail=str(e))
 
 # Initialize the copilots
-eval_copilot = EvaluationCopilot(logging=True)
-relevance_eval_copilot = RelevanceEvaluationCopilot(logging=True)
-coherence_eval_copilot = CoherenceEvaluationCopilot(logging=True)
-fluency_eval_copilot = FluencyEvaluationCopilot(logging=True)
-groundedness_eval_copilot = GroundednessEvaluationCopilot(logging=True)
-improvement_copilot = ImprovementCopilot(logging=True)
+eval_copilot = EvaluationCopilot(client, logging=True)
+relevance_eval_copilot = RelevanceEvaluationCopilot(client, logging=True)
+coherence_eval_copilot = CoherenceEvaluationCopilot(client, logging=True)
+fluency_eval_copilot = FluencyEvaluationCopilot(client, logging=True)
+groundedness_eval_copilot = GroundednessEvaluationCopilot(client, logging=True)
+improvement_copilot = ImprovementCopilot(client, logging=True)
 
 @app.post("/evaluate_endpoint", response_model=EvaluationOutput)
 async def evaluate_response(eval_request: EvaluationRequest):
