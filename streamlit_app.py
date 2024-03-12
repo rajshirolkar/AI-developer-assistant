@@ -44,7 +44,7 @@ def get_llm_response(question: str) -> str:
 # Sidebar buttons for switching between functionalities
 app_mode = st.sidebar.radio(
     "Choose the application mode:",
-    ("Evaluation Playground", "EvaluationCopilot Usage")
+    ("Evaluation Playground", "EvaluationCopilot Usage", "Chat With Evaluations Example")
 )
 
 if app_mode == "Evaluation Playground":
@@ -100,8 +100,8 @@ if app_mode == "Evaluation Playground":
             st.markdown(f"> {improvement_output.answer_improvement}", unsafe_allow_html=True)
 
 elif app_mode == "EvaluationCopilot Usage":
-    st.title("File Analyser with Pandas AI")
-    uploaded_file = st.file_uploader("Upload a file for analysis", type=['xlsx', 'csv'])
+    st.title("AI Chat with your evaluations")
+    uploaded_file = st.file_uploader("Upload a csv for analysis", type=['xlsx', 'csv'])
 
     if uploaded_file:
         file_type = uploaded_file.name.split('.')[-1]
@@ -126,7 +126,37 @@ elif app_mode == "EvaluationCopilot Usage":
             else:
                 st.warning("Please enter a prompt.")
 
+elif app_mode == "Chat With Evaluations Example":
+    st.title("Chat With Evaluations Example")
 
+    # Pre-upload the CSV file from the datasets folder
+    example_file_path = "datasets/poor.csv"
+    try:
+        df_example = pd.read_csv(example_file_path)
+        sdf_example = SmartDataframe(df_example, config={'llm': llm})
+        st.write(df_example.head())
+
+        # Example commands and their outputs
+        example_commands = [
+            "Summarize the justification for all scores equal to 1",
+            "Plot the histogram of evaluations scores",
+            "Make a pie chart showing the distribution of scores",
+            "Which records have justification showing inaccurate",
+            "Give me the records where justification consists of inaccurate answer"
+        ]
+
+        st.write("## Example Commands")
+        for command in example_commands:
+            if st.button(f"Run: {command}"):
+                st.write("PandasAI is generating answer...")
+                try:
+                    resp = sdf_example.chat(command)
+                    st.write(resp)
+                except Exception as e:
+                    st.error(f"An error occurred: {e}")
+
+    except FileNotFoundError:
+        st.error(f"File not found: {example_file_path}")
 # st.title('Evaluation Copilot Demo')
 
 # evaluation_type = st.radio(
