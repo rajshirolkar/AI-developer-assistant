@@ -104,7 +104,13 @@ elif app_mode == "EvaluationCopilot Usage":
     uploaded_file = st.file_uploader("Upload a file for analysis", type=['xlsx', 'csv'])
 
     if uploaded_file:
-        df = pd.read_excel(uploaded_file, header=None, names=['id', 'questions', 'answers', 'scores', 'justifications'])
+        file_type = uploaded_file.name.split('.')[-1]
+
+        if file_type == 'xlsx':
+            df = pd.read_excel(uploaded_file, header=None, names=['id', 'questions', 'answers', 'scores', 'justifications'])
+        elif file_type == 'csv':
+            df = pd.read_csv(uploaded_file)
+
         sdf = SmartDataframe(df, config={'llm': llm})
         st.write(df.head())
 
@@ -113,7 +119,7 @@ elif app_mode == "EvaluationCopilot Usage":
             if prompt:
                 st.write("PandasAI is generating answer...")
                 print("Before")
-                resp = sdf.chat(prompt, )
+                resp = sdf.chat(prompt)
                 print(resp)
                 st.write(resp)
                 print("after")
