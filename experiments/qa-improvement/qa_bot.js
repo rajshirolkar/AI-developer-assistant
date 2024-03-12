@@ -10,6 +10,19 @@ const qaSession = {
   answerImprovement: "",
 };
 
+// Listen for changes on the evaluation type radio buttons
+document.querySelectorAll('input[name="evaluationType"]').forEach((radio) => {
+  radio.addEventListener("change", function () {
+    qaSession.evaluationType = this.value;
+    // Show or hide the context input based on the selected evaluation type
+    if (this.value === "Relevance" || this.value === "Groundedness") {
+      document.getElementById("contextGroup").style.display = "block";
+    } else {
+      document.getElementById("contextGroup").style.display = "none";
+    }
+  });
+});
+
 document.getElementById("sendPrompt").addEventListener("click", function () {
   qaSession.question = document.getElementById("promptInput").value;
 
@@ -30,6 +43,7 @@ document.getElementById("sendPrompt").addEventListener("click", function () {
       document.getElementById("responseOutput").innerText = qaSession.answer;
 
       // Automatically trigger evaluation after receiving the response
+      qaSession.context = document.getElementById("contextInput").value;
       triggerEvaluation();
     })
     .catch((error) => {
@@ -63,10 +77,12 @@ function triggerEvaluation() {
       qaSession.justification = data.justification;
       document.getElementById("evaluationScore").innerText =
         "Score: " + qaSession.score;
-      document.getElementById("evaluationJustification").innerText =
-        "Justification: " + qaSession.justification;
+      const justificationHtml = marked.parse(qaSession.justification);
+      document.getElementById("evaluationJustification").innerHTML =
+        justificationHtml;
 
       // Automatically trigger improvement suggestions after evaluation
+      qaSession.context = document.getElementById("contextInput").value;
       triggerImprovementSuggestions();
     })
     .catch((error) => {

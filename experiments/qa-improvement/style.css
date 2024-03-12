@@ -1,0 +1,157 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+/* Root variables */
+:root {
+  --primary-color: #007ada;
+  --secondary-color: #f2f8fc;
+  --background-color: #fafafa;
+  --section-background-color: #ffffff;
+  --text-color: #333333;
+  --primary-hover-color: #0056b3;
+}
+
+/* General styles */
+body,
+html {
+  height: 100%;
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+/* Layout styles */
+body {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+header {
+  background-color: var(--primary-color);
+  padding: 30px;
+  display: flex;
+  align-items: center;
+  color: white;
+}
+
+main {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  background-color: var(--section-background-color);
+}
+
+/* Typography styles */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 0.5em;
+}
+
+p {
+  font-weight: 400;
+  text-align: justify;
+  margin-bottom: 1em;
+}
+
+input[type="text"], textarea {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+button {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+/* Spinner styles */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s ease infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Chat and Evaluations sections */
+#chat {
+  flex: 2.5;
+  padding: 0px 20px 0px 20px;
+  border-right: 2px solid #eeeeee;
+}
+
+#evaluations {
+  flex: 1.5;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+  background-color: var(--section-background-color);
+  padding: 0px 20px 0px 20px;
+}
+
+#chat button {
+  display: block;
+  margin-left: auto; /* Pushes the button to the right */
+  margin-bottom: 10px;
+}
+
+/* Section header styles */
+.section-header {
+  font-size: 24px;
+  background-color: var(--primary-color);
+  color: #ffffff;
+  padding: 10px 0; /* Only apply top and bottom padding */
+  border-bottom: 2px solid var(--primary-color);
+  display: block;
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  margin-left: -20px; /* Shift to align with the parent's edge */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+#evaluations-container {
+  max-height: calc(100vh - 60px - 20px); /* Adjust based on the actual header height */
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Logo styles */
+#logo {
+  height: 50px;
+  width: auto;
+  margin-right: 20px;
+  margin-bottom: 20px;
+}
+
+header h1 {
+    color: #ffffff; /* Ensures visibility against the primary color background */
+  }
+  
+  /* Ensure the main heading stands out */
+  .section-header {
+    color: #ffffff; /* This could be white or any other color that contrasts well with the primary color */
+  }
