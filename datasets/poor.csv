@@ -1,4 +1,4 @@
-Number,prompt,answer,general_evaluation_score,justification,question_improvement,answer_improvement
+number,prompt,answer,score,justification,question_improvement_suggestions,answer_improvement_suggestions
 0,"Question: When is the scheduled launch date and time for the PSLV-C56 mission, and where will it be launched from?",The scheduled launch date and time for the PSLV-C56 mission have not been provided.The PSLV-C56 mission is an important space mission for India. It aims to launch a satellite into orbit to study weather patterns.',1,"
 - The AI assistant failed to provide the correct date and time for the scheduled launch of the PSLV-C56 mission, even though this information was clearly stated in the context provided. The launch was scheduled for Sunday, 30 July 2023 at 06:30 IST / 01:00 UTC.
 - The assistant also did not specify the launch location, which was mentioned in the context as the Satish Dhawan Space Centre, Sriharikota, Andhra Pradesh, India.
